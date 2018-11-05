@@ -1,0 +1,34 @@
+# CircleCI build config to test the Google Coud Platform CLI orb
+# published by CircleCI
+
+version: 2.1
+
+orbs:
+  gcp-cli: circlecli/gcp-cli@1.0.0
+
+jobs:
+  install:
+    executor: gcp-cli/default
+    steps:
+      # test orb commands
+      - gcp-cli/install
+      - gcp-cli/initialize:
+          google-project-id: citric-biplane-94023
+          google-compute-zone: us-west1-b
+      - run: gcloud -v
+
+workflows:
+  install_and_initialize_gcloud:
+    jobs:
+      # test orb commands
+      - install:
+          context: ttrahan
+      # test orb jobs
+      - gcp-cli/install_and_initialize_cli:
+          context: ttrahan
+          google-project-id: citric-biplane-94023
+          google-compute-zone: us-west1-b
+      - gcp-cli/use_google_image_and_initialize_cli:
+          context: ttrahan
+          google-project-id: citric-biplane-94023
+          google-compute-zone: us-west1-b
