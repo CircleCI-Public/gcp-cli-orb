@@ -1,15 +1,10 @@
 version: 2.1
 description: |
-  Installs the Google Cloud Command Line Interface (gcloud)
+  Installs and configures the Google Cloud command-line interface (gcloud)
 
-  The executors within this Orb provide run-time environments that contain the
-  necessary dependencies for executing the jobs and commands in this orb,
-  except for the following required dependencies that must be configured in
-  CircleCI in order to use this orb - environment variables for gcloud
-  initialization ($GCLOUD_SERVICE_KEY).
+  View the source for this orb on GitHub: https://github.com/CircleCI-Public/gcp-cli-orb
 
-  The source for this Orb can be found here:
-  https://github.com/CircleCI-Public/circleci-orbs/tree/master/src/gcp-cli
+  View this orb in CircleCI's orb registry: https://circleci.com/orbs/registry/orb/circleci/gcp-cli
 
 examples:
   simple_install_and_configure:
@@ -26,7 +21,7 @@ examples:
           executor: default
           jobs:
             - gcp-cli/install_and_configure_cli:
-                context: myContext # your context containing gcloud service key
+                context: myContext # store your gCloud service key via Contexts, or project-level environment variables
                 google-project-id: myGoogleProjectId
                 google-compute-zone: myGoogleComputeZone
 
