@@ -1,10 +1,7 @@
 version: 2.1
+
 description: |
-  Installs and configures the Google Cloud command-line interface (gcloud)
-
-  View the source for this orb on GitHub: https://github.com/CircleCI-Public/gcp-cli-orb
-
-  View this orb in CircleCI's orb registry: https://circleci.com/orbs/registry/orb/circleci/gcp-cli
+  Install and configure the Google Cloud CLI (gcloud)
 
 examples:
   simple_install_and_configure:
