@@ -109,7 +109,7 @@ commands:
             if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
             # Store service account
-            printf <<parameters.gcloud-service-key>> > ${HOME}/gcloud-service-key.json
+            echo <<parameters.gcloud-service-key>> | base64 --decode > ${HOME}/gcloud-service-key.json
 
             # Initialize gcloud CLI
             $SUDO gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
