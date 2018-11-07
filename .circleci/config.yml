@@ -4,7 +4,7 @@
 version: 2.1
 
 orbs:
-  gcp-cli: circlecli/gcp-cli@1.0.0
+  gcp-cli: iynere/gcp-cli@dev:alpha
 
 jobs:
   install:
