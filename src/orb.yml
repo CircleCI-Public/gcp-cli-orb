@@ -85,7 +85,7 @@ commands:
             else
               echo "gcloud CLI is already installed."
             fi
- 
+
   initialize:
     description: Initilize the gcloud CLI
     parameters:
@@ -109,7 +109,7 @@ commands:
             if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
             # Store service account
-            echo <<parameters.gcloud-service-key>> > ${HOME}/gcloud-service-key.json
+            printf <<parameters.gcloud-service-key>> > ${HOME}/gcloud-service-key.json
 
             # Initialize gcloud CLI
             $SUDO gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
