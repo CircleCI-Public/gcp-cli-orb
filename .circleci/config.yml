@@ -21,14 +21,11 @@ workflows:
   install_and_initialize_gcloud:
     jobs:
       # test orb commands
-      - install:
-          context: ttrahan
+      - install
       # test orb jobs
       - gcp-cli/install_and_initialize_cli:
-          context: ttrahan
           google-project-id: citric-biplane-94023
           google-compute-zone: us-west1-b
       - gcp-cli/use_google_image_and_initialize_cli:
-          context: ttrahan
           google-project-id: citric-biplane-94023
           google-compute-zone: us-west1-b
