@@ -12,8 +12,7 @@ jobs:
     steps:
       # test orb commands
       - gcp-cli/install
-      - gcp-cli/initialize:
-          gcloud-service-key: "{$GCLOUD_SERVICE_KEY}"
+      - gcp-cli/initialize
       - run: gcloud -v
 
 workflows:
