@@ -13,8 +13,7 @@ jobs:
       # test orb commands
       - gcp-cli/install
       - gcp-cli/initialize:
-          google-project-id: citric-biplane-94023
-          google-compute-zone: us-west1-b
+          gcloud-service-key: "{$GCLOUD_SERVICE_KEY}"
       - run: gcloud -v
 
 workflows:
@@ -24,8 +23,8 @@ workflows:
       - install
       # test orb jobs
       - gcp-cli/install_and_initialize_cli:
-          google-project-id: citric-biplane-94023
-          google-compute-zone: us-west1-b
+          requires:
+            - install
       - gcp-cli/use_google_image_and_initialize_cli:
-          google-project-id: citric-biplane-94023
-          google-compute-zone: us-west1-b
+          requires:
+            - gcp-cli/install_and_initialize_cli
