@@ -1,7 +1,3 @@
-# CircleCI build config to test the Google Coud Platform CLI orb
-
-# published by CircleCI
-
 version: 2.1
 
 orbs:
