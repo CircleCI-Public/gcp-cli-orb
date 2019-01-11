@@ -11,7 +11,8 @@ See [this orb's listing in CircleCI's orb registry](https://circleci.com/orbs/re
 In order to use this orb, the following environment variables must be available in your CircleCI job (they can be stored as [Contexts](https://circleci.com/docs/2.0/contexts) resources or as [project-level environment variables](https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-project)):
 
 * `GCLOUD_SERVICE_KEY`: environment variable for GCP login
-parameter values:
+
+Parameter values:
 * `GOOGLE_PROJECT_ID`
 * `GOOGLE_COMPUTE_ZONE`
 
@@ -28,7 +29,7 @@ workflows:
     # optionally determine executor to use
     executor: default
     jobs:
-      - gcp-cli/install_and_configure_cli:
+      - gcp-cli/install_and_initialize_cli:
           context: myContext # store your gCloud service key via Contexts,
           # or project-level environment variables
           # the below two environment variables may also be stored as environment variables,
