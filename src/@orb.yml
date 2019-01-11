@@ -10,14 +10,14 @@ examples:
       version: 2.1
 
       orbs:
-        gcp-cli: circleci/gcp-cli@1.0.0
+        gcp-cli: circleci/gcp-cli@1.0.2
 
       workflows:
         install_and_configure_cli:
           # optionally determine executor to use
           executor: default
           jobs:
-            - gcp-cli/install_and_configure_cli:
+            - gcp-cli/install_and_initialize_cli:
                 context: myContext # store your gCloud service key via Contexts, or project-level environment variables
                 google-project-id: myGoogleProjectId
                 google-compute-zone: myGoogleComputeZone
