@@ -22,7 +22,7 @@ Parameter values:
 version: 2.1
 
 orbs:
-  gcp-cli: circleci/gcp-cli@1.0.2
+  gcp-cli: circleci/gcp-cli@1.0.0
 
 workflows:
   install_and_configure_cli:
