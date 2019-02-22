@@ -97,16 +97,13 @@ commands:
       - run:
           name: Initialize gcloud CLI to connect to Google Cloud
           command: |
-            # Set sudo to work whether logged in as root user or non-root user
-            if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
-
             # Store service account
             echo $<<parameters.gcloud-service-key>> > ${HOME}/gcloud-service-key.json
 
             # Initialize gcloud CLI
-            $SUDO gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-            $SUDO gcloud --quiet config set project $<<parameters.google-project-id>>
-            $SUDO gcloud --quiet config set compute/zone $<<parameters.google-compute-zone>>
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project $<<parameters.google-project-id>>
+            gcloud --quiet config set compute/zone $<<parameters.google-compute-zone>>
 
 jobs:
   install_and_initialize_cli:
