@@ -3,25 +3,6 @@ version: 2.1
 description: |
   Install and configure the Google Cloud CLI (gcloud)
 
-examples:
-  simple_install_and_configure:
-    description: Install the gcloud CLI, if not available
-    usage:
-      version: 2.1
-
-      orbs:
-        gcp-cli: circleci/gcp-cli@1.0.0
-
-      workflows:
-        install_and_configure_cli:
-          # optionally determine executor to use
-          executor: default
-          jobs:
-            - gcp-cli/install_and_initialize_cli:
-                context: myContext # store your gCloud service key via Contexts, or project-level environment variables
-                google-project-id: myGoogleProjectId
-                google-compute-zone: myGoogleComputeZone
-
 executors:
   default:
     description: A debian based docker container to use when running the
