@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   gcp-cli: circleci/gcp-cli@dev:alpha
+  orb-tools: circleci/orb-tools@8.3.0
 
 executors:
   cli:
@@ -18,60 +19,6 @@ executors:
       - image: circleci/node
 
 jobs:
-  lint:
-    executor: lint-condo
-    steps:
-      - checkout
-      - run: yamllint .
-
-  validate:
-    executor: cli
-    steps:
-      - checkout
-      - run: circleci orb validate src/@orb.yml
-
-  publish-dev:
-    executor: cli
-    steps:
-      - checkout
-
-      - run:
-          name: publish dev versions
-          command: |
-            # for integration testing
-            circleci orb publish src/@orb.yml circleci/gcp-cli@dev:alpha --token $CIRCLE_TOKEN
-
-            # for transparency
-            circleci orb publish src/@orb.yml circleci/gcp-cli@dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
-
-            # for potentially promoting to prod
-            circleci orb publish src/@orb.yml circleci/gcp-cli@dev:${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
-
-  trigger-integration:
-    executor: node
-    parameters:
-      tag:
-        type: enum
-        default: "integration"
-        enum: ["integration", master]
-    steps:
-      - checkout
-
-      - add_ssh_keys:
-          fingerprints:
-            - "44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09"
-
-      - run:
-          name: git config
-          command: |
-            git config --global user.email "$CIRCLE_USERNAME@users.noreply.github.com"
-            git config --global user.name "$CIRCLE_USERNAME"
-
-      - run: |
-          INTEGRATION_TAG=<<parameters.tag>>-$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
-          git tag $INTEGRATION_TAG
-          git push origin $INTEGRATION_TAG
-
   install:
     executor: gcp-cli/default
     steps:
@@ -80,63 +27,70 @@ jobs:
       - gcp-cli/initialize
       - run: gcloud -v
 
-  dev-promote-prod:
-    executor: cli
-    steps:
-      - checkout
-      - run: circleci orb publish promote circleci/gcp-cli@dev:${CIRCLE_SHA1:0:7} patch --token $CIRCLE_TOKEN
+# yaml anchor filters
+integration-dev_filters: &integration-dev_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /integration-.*/
+
+integration-master_filters: &integration-master_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /master-.*/
+
+prod-deploy_requires: &prod-deploy_requires
+  [install_initialize-master, google-image_install_initialize-master]
 
 workflows:
-  validate_unit-test_dev-deploy:
+  lint_pack-validate_publish-dev:
     jobs:
-      - lint
+      - orb-tools/lint
 
-      - validate:
+      - orb-tools/pack:
           requires:
-            - lint
+            - orb-tools/lint
 
-      - publish-dev:
-          requires:
-            - validate
+      - orb-tools/publish-dev:
+          orb-name: circleci/gcp-cli
           context: orb-publishing
-
-      - trigger-integration:
-          name: trigger-integration-dev
           requires:
-            - publish-dev
+            - orb-tools/pack
+
+      - orb-tools/trigger-integration-workflow:
+          name: trigger-integration-dev
+          context: orb-publishing
+          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
+          requires:
+            - orb-tools/publish-dev
           filters:
             branches:
               ignore: master
 
-      - trigger-integration:
+      - orb-tools/trigger-integration-workflow:
           name: trigger-integration-master
+          context: orb-publishing
+          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
           tag: master
           requires:
-            - publish-dev
+            - orb-tools/publish-dev
           filters:
             branches:
               only: master
 
-  integration_test-prod_deploy:
+  integration-tests_prod-release:
     jobs:
       # test orb commands
       - install:
           name: install-dev
           context: orb-publishing
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /integration-.*/
+          filters: *integration-dev_filters
 
       - install:
           name: install-master
           context: orb-publishing
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-.*/
+          filters: *integration-master_filters
 
       # test orb jobs
       - gcp-cli/install_and_initialize_cli:
@@ -144,52 +98,61 @@ workflows:
           requires:
             - install-dev
           context: orb-publishing
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /integration-.*/
+          filters: *integration-dev_filters
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-master
           requires:
             - install-master
           context: orb-publishing
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-.*/
+          filters: *integration-master_filters
 
       - gcp-cli/use_google_image_and_initialize_cli:
           name: google-image_install_initialize-dev
           context: orb-publishing
           requires:
             - install-dev
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /integration-.*/
+          filters: *integration-dev_filters
 
       - gcp-cli/use_google_image_and_initialize_cli:
           name: google-image_install_initialize-master
           context: orb-publishing
           requires:
             - install-master
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-.*/
+          filters: *integration-master_filters
 
-      - dev-promote-prod:
+      # patch, minor, or major publishing
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-patch
           context: orb-publishing
-          requires:
-            - install_initialize-master
-            - google-image_install_initialize-master
+          orb-name: circleci/gcp-cli
+          requires: *prod-deploy_requires
           filters:
             branches:
               ignore: /.*/
             tags:
-              only: /master-.*/
+              only: /master-patch.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-minor
+          context: orb-publishing
+          orb-name: circleci/gcp-cli
+          release: minor
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-minor.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-major
+          context: orb-publishing
+          orb-name: circleci/gcp-cli
+          release: major
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-major.*/

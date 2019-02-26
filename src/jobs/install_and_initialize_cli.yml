@@ -1,0 +1,37 @@
+description: >
+  Install gcloud CLI and initialize to connect to Google Cloud
+
+executor: <<parameter.executor>>
+
+parameters:
+  executor:
+    type: string
+    default: "default"
+    description: >
+      Executor to use for this job. Defaults to this orb's default
+      executor.
+
+  gcloud-service-key:
+    description: The gcloud service key
+    type: env_var_name
+    default: GCLOUD_SERVICE_KEY
+
+  google-project-id:
+    description: The Google project ID to connect with via the gcloud CLI
+    type: env_var_name
+    default: GOOGLE_PROJECT_ID
+
+  google-compute-zone:
+    description: The Google compute zone to connect with via the gcloud CLI
+    type: env_var_name
+    default: GOOGLE_COMPUTE_ZONE
+
+steps:
+  - install
+
+  - initialize:
+      gcloud-service-key: <<parameters.gcloud-service-key>>
+      google-project-id: <<parameters.google-project-id>>
+      google-compute-zone: <<parameters.google-compute-zone>>
+
+  - run: gcloud -v
