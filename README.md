@@ -1,4 +1,4 @@
-# GCP CLI Orb ![CircleCI status](https://circleci.com/gh/CircleCI-Public/gcp-cli-orb.svg "CircleCI status")
+# GCP CLI Orb [![CircleCI Build Status](https://circleci.com/gh/CircleCI-Public/gcp-cli-orb.svg?style=shield "CircleCI Build Status")](https://circleci.com/gh/CircleCI-Public/gcp-cli-orb) [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/gcp-cli)](https://circleci.com/orbs/registry/orb/circleci/gcp-cli)
 
 Easily install and configure the Google Cloud CLI in your CircleCI jobs.
 
