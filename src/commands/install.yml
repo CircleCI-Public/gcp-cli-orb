@@ -33,7 +33,7 @@ steps:
               if [[ $(command -v gcloud) == "" ]]; then
                 curl https://sdk.cloud.google.com > gcloud-install.sh
 
-                bash install.sh --disable-prompts --install-dir=<<parameters.install-dir>>
+                bash gcloud-install.sh --disable-prompts --install-dir=<<parameters.install-dir>>
 
                 export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
               else
@@ -49,7 +49,9 @@ steps:
               if [[ $(command -v gcloud) == "" ]]; then
                 curl https://storage.cloud.google.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz > gcloud-install.tar.gz
 
-                tar -xvf gcloud-install.tar.gz --disable-prompts --install-dir=<<parameters.install-dir>>
+                tar -xvf gcloud-install.tar.gz
+
+                ./google-cloud-sdk/install.sh --disable-prompts --install-dir=<<parameters.install-dir>>
 
                 export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
               else
