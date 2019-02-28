@@ -8,10 +8,8 @@ usage:
 
   workflows:
     install_and_configure_cli:
-      # optionally determine executor to use
-      executor: gcp-cli/default
       jobs:
         - gcp-cli/install_and_initialize_cli:
+            # optionally determine executor to use
+            executor: gcp-cli/default
             context: myContext # store your gCloud service key via Contexts, or project-level environment variables
-            google-project-id: myGoogleProjectId
-            google-compute-zone: myGoogleComputeZone
