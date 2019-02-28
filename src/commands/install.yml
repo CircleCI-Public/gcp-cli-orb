@@ -1,42 +1,63 @@
 description: |
   Install the gcloud CLI, if not available
 
-# parameters:
-#   sdk-version:
-#     type: string
-#     default: "latest"
-#     description: >
-#       Pick a version of the gcloud CLI to install
+parameters:
+  use-latest:
+    type: boolean
+    default: true
+    description: >
+      Install the latest version of the CLI? If false, specify a version
+      below
+
+  sdk-version:
+    type: string
+    default: ""
+    description: >
+      Pick a version of the gcloud CLI to install:
+      https://cloud.google.com/sdk/docs/downloads-versioned-archives
+      https://console.cloud.google.com/storage/browser/cloud-sdk-release
+
+  install-dir:
+    type: string
+    default: $HOME
+    description: >
+      Where should the gcloud CLI be installed?
 
 steps:
+  - when:
+      condition: <<parameters.use-latest>>
+      steps:
+        - run:
+            name: Install latest gcloud CLI version, if not available
+            command: |
+              if [[ $(command -v gcloud) == "" ]]; then
+                curl https://sdk.cloud.google.com > gcloud-install.sh
+
+                bash install.sh --disable-prompts --install-dir=<<parameters.install-dir>>
+
+                export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
+              else
+                echo "gcloud CLI is already installed."
+              fi
+
+  - unless:
+      condition: <<parameters.use-latest>>
+      steps:
+        - run:
+            name: Install gcloud CLI v<<parameters.sdk-version>>, if not available
+            command: |
+              if [[ $(command -v gcloud) == "" ]]; then
+                curl https://storage.cloud.google.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz > gcloud-install.tar.gz
+
+                tar -xvf gcloud-install.tar.gz --disable-prompts --install-dir=<<parameters.install-dir>>
+
+                export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
+              else
+                echo "gcloud CLI is already installed."
+              fi
+
   - run:
-      name: Install gcloud CLI, if not available
+      name: Run gcloud init, verify version
       command: |
-        # Set sudo to work whether logged in as root user or non-root user
-        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
-
-        # Create an environment variable for the correct distribution
-        if [[ $(command -v lsb_release) == "" ]]; then
-          $SUDO apt-get update && $SUDO apt-get -y install lsb-release
-          export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-        else
-          export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-        fi
-
-        # Add the Google Cloud SDK distribution URI as a package source
-        echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | $SUDO tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-        # Import the Google Cloud public key
-        if [[ $(command -v curl) == "" ]]; then
-          $SUDO apt-get update && $SUDO apt-get -y install curl
-          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
-        else
-          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
-        fi
-
-        # Update and install the Cloud SDK
-        if [[ $(command -v gcloud) == "" ]]; then
-          $SUDO apt-get update && $SUDO apt-get -y install google-cloud-sdk
-          echo "gcloud CLI is now installed."
-        else
-          echo "gcloud CLI is already installed."
-        fi
+        gcloud init
+        gcloud version
