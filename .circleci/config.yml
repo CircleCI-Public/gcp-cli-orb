@@ -18,14 +18,30 @@ executors:
     docker:
       - image: circleci/node
 
-jobs:
+commands:
   install:
-    executor: gcp-cli/default
     steps:
+      - checkout
       # test orb commands
       - gcp-cli/install
       - gcp-cli/initialize
       - run: gcloud -v
+
+jobs:
+  install-default:
+    executor: gcp-cli/default
+    steps:
+      - install
+
+  install-google:
+    executor: gcp-cli/google
+    steps:
+      - install
+
+  install-machine:
+    executor: gcp-cli/machine
+    steps:
+      - install
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
@@ -41,7 +57,7 @@ integration-master_filters: &integration-master_filters
     only: /master-.*/
 
 prod-deploy_requires: &prod-deploy_requires
-  [install_initialize-master, google-image_install_initialize-master]
+  [install-default-master, install-google-master, install-machine-master, install_initialize-default-master, install_initialize-google-master, install_initialize-machine-master]
 
 workflows:
   lint_pack-validate_publish-dev:
@@ -80,41 +96,73 @@ workflows:
   integration-tests_prod-release:
     jobs:
       # triggered by non-master branch commits
-      - install:
-          name: install-dev
+      # run all commands with all executors
+      - install-default:
+          name: install-default-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      - install-google:
+          name: install-google-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      - install-machine:
+          name: install-machine-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      # run job with all executors
+      - gcp-cli/install_and_initialize_cli:
+          name: install_initialize-default-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
       - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-dev
-          requires: [install-dev]
-          context: orb-publishing
-          filters: *integration-dev_filters
-
-      - gcp-cli/install_and_initialize_cli:
-          name: google-image_install_initialize-dev
+          name: install_initialize-google-dev
           executor: gcp-cli/google
           context: orb-publishing
-          requires: [install-dev]
+          filters: *integration-dev_filters
+
+      - gcp-cli/install_and_initialize_cli:
+          name: install_initialize-machine-dev
+          executor: gcp-cli/machine
+          context: orb-publishing
           filters: *integration-dev_filters
 
       # triggered by master branch commits
-      - install:
-          name: install-master
+      # run all commands with all executors
+      - install-default:
+          name: install-default-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - install-google:
+          name: install-google-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - install-machine:
+          name: install-machine-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      # run job with all executors
+      - gcp-cli/install_and_initialize_cli:
+          name: install_initialize-default-master
           context: orb-publishing
           filters: *integration-master_filters
 
       - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-master
-          requires: [install-master]
-          context: orb-publishing
-          filters: *integration-master_filters
-
-      - gcp-cli/install_and_initialize_cli:
-          name: google-image_install_initialize-master
+          name: install_initialize-google-master
           executor: gcp-cli/google
           context: orb-publishing
-          requires: [install-master]
+          filters: *integration-master_filters
+
+      - gcp-cli/install_and_initialize_cli:
+          name: install_initialize-machine-master
+          executor: gcp-cli/machine
+          context: orb-publishing
           filters: *integration-master_filters
 
       # patch, minor, or major publishing
