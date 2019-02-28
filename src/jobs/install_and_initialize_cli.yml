@@ -5,8 +5,8 @@ executor: <<parameters.executor>>
 
 parameters:
   executor:
-    type: string
-    default: "default"
+    type: executor
+    default: default
     description: >
       Executor to use for this job. Defaults to this orb's default
       executor.
