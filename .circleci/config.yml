@@ -87,16 +87,15 @@ workflows:
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-dev
-          requires:
-            - install-dev
+          requires: [install-dev]
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - gcp-cli/use_google_image_and_initialize_cli:
+      - gcp-cli/install_and_initialize_cli:
           name: google-image_install_initialize-dev
+          executor: google
           context: orb-publishing
-          requires:
-            - install-dev
+          requires: [install-dev]
           filters: *integration-dev_filters
 
       # triggered by master branch commits
@@ -107,16 +106,15 @@ workflows:
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-master
-          requires:
-            - install-master
+          requires: [install-master]
           context: orb-publishing
           filters: *integration-master_filters
 
-      - gcp-cli/use_google_image_and_initialize_cli:
+      - gcp-cli/install_and_initialize_cli:
           name: google-image_install_initialize-master
+          executor: google
           context: orb-publishing
-          requires:
-            - install-master
+          requires: [install-master]
           filters: *integration-master_filters
 
       # patch, minor, or major publishing
