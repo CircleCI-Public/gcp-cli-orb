@@ -62,8 +62,7 @@ workflows:
           name: trigger-integration-dev
           context: orb-publishing
           ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               ignore: master
@@ -73,26 +72,19 @@ workflows:
           context: orb-publishing
           ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
           tag: master
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               only: master
 
   integration-tests_prod-release:
     jobs:
-      # test orb commands
+      # triggered by non-master branch commits
       - install:
           name: install-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - install:
-          name: install-master
-          context: orb-publishing
-          filters: *integration-master_filters
-
-      # test orb jobs
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-dev
           requires:
@@ -100,19 +92,25 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-master
-          requires:
-            - install-master
-          context: orb-publishing
-          filters: *integration-master_filters
-
       - gcp-cli/use_google_image_and_initialize_cli:
           name: google-image_install_initialize-dev
           context: orb-publishing
           requires:
             - install-dev
           filters: *integration-dev_filters
+
+      # triggered by master branch commits
+      - install:
+          name: install-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - gcp-cli/install_and_initialize_cli:
+          name: install_initialize-master
+          requires:
+            - install-master
+          context: orb-publishing
+          filters: *integration-master_filters
 
       - gcp-cli/use_google_image_and_initialize_cli:
           name: google-image_install_initialize-master
