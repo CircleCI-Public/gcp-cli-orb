@@ -93,7 +93,7 @@ workflows:
 
       - gcp-cli/install_and_initialize_cli:
           name: google-image_install_initialize-dev
-          executor: google
+          executor: gcp-cli/google
           context: orb-publishing
           requires: [install-dev]
           filters: *integration-dev_filters
@@ -112,7 +112,7 @@ workflows:
 
       - gcp-cli/install_and_initialize_cli:
           name: google-image_install_initialize-master
-          executor: google
+          executor: gcp-cli/google
           context: orb-publishing
           requires: [install-master]
           filters: *integration-master_filters
