@@ -18,19 +18,20 @@ steps:
   - run:
       name: Install latest gcloud CLI version, if not available
       command: |
-        curl \
-          https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz > \
-          google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
+        install () {
+          curl \
+            https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz > \
+            google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
 
-        tar -xzf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
-        rm -rf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
+          tar -xzf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
+          rm -rf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
 
-        ./google-cloud-sdk/install.sh \
-           --quiet
+          ./google-cloud-sdk/install.sh \
+             --quiet
 
-        export PATH="$HOME/google-cloud-sdk/bin:$PATH"
+          export PATH="$HOME/google-cloud-sdk/bin:$PATH"
 
-        exec -l $SHELL
+          exec -l $SHELL
         }
 
         if grep 'docker\|lxc' /proc/1/cgroup; then
