@@ -13,8 +13,6 @@ commands:
       - gcp-cli/install
       - gcp-cli/initialize
 
-      - run: gcloud -v
-
   install-versioned:
     steps:
       - checkout
@@ -26,8 +24,6 @@ commands:
           install-dir: /usr/local/bin
 
       - gcp-cli/initialize
-
-      - run: gcloud -v
 
 jobs:
   # default executor

@@ -14,7 +14,6 @@ parameters:
     default: ""
     description: >
       Pick a version of the gcloud CLI to install:
-      https://cloud.google.com/sdk/docs/downloads-versioned-archives
       https://console.cloud.google.com/storage/browser/cloud-sdk-release
 
   install-dir:
@@ -52,7 +51,9 @@ steps:
                   echo "gcloud CLI is already installed."
                 fi
               else
+                echo "----------------------------------------------------------------------------------------------------"
                 echo "this is a machine executor job, overriding default installation of gcloud CLI"
+                echo "----------------------------------------------------------------------------------------------------"
                 install_latest
               fi
 
@@ -66,10 +67,10 @@ steps:
             command: |
               install_versioned () {
                 curl \
-                  https://storage.cloud.google.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz > \
-                  gcloud-install.tar.gz
+                  https://storage.cloud.google.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
 
-                tar -xvf gcloud-install.tar.gz
+                tar -xzf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
+                rm -rf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
 
                 ./google-cloud-sdk/install.sh \
                   --disable-prompts \
@@ -85,7 +86,9 @@ steps:
                   echo "gcloud CLI is already installed."
                 fi
               else
+              	echo "----------------------------------------------------------------------------------------------------"
                 echo "this is a machine executor job, overriding default installation of gcloud CLI"
+                echo "----------------------------------------------------------------------------------------------------"
                 install_versioned
               fi
 
