@@ -5,12 +5,28 @@ orbs:
   orb-tools: circleci/orb-tools@8.3.0
 
 commands:
-  install:
+  install-latest:
     steps:
       - checkout
+
       # test orb commands
       - gcp-cli/install
       - gcp-cli/initialize
+
+      - run: gcloud -v
+
+  install-versioned:
+    steps:
+      - checkout
+
+      # test orb commands
+      - gcp-cli/install:
+          use-latest: false
+          sdk-version: 224.0.0
+          install-dir: /usr/local/bin
+
+      - gcp-cli/initialize
+
       - run: gcloud -v
 
 jobs:
@@ -18,43 +34,34 @@ jobs:
   install-default-latest:
     executor: gcp-cli/default
     steps:
-      - install
+      - install-latest
 
   install-default-versioned:
     executor: gcp-cli/default
     steps:
-      - install:
-          use-latest: false
-          sdk-version: 224.0.0
-          install-dir: /usr/local/bin
+      - install-versioned
 
   # google cloud image
   install-google-latest:
     executor: gcp-cli/google
     steps:
-      - install
+      - install-latest
 
   install-google-versioned:
     executor: gcp-cli/google
     steps:
-      - install:
-          use-latest: false
-          sdk-version: 224.0.0
-          install-dir: /usr/local/bin
+      - install-versioned
 
   # machine executor
   install-machine-latest:
     executor: gcp-cli/machine
     steps:
-      - install
+      - install-latest
 
   install-machine-versioned:
     executor: gcp-cli/machine
     steps:
-      - install:
-          use-latest: false
-          sdk-version: 224.0.0
-          install-dir: /usr/local/bin
+      - install-versioned
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
