@@ -1,13 +1,6 @@
 description: |
   Install the gcloud CLI, if not available
 
-parameters:
-  install-dir:
-    type: string
-    default: $HOME
-    description: >
-      Where should the gcloud CLI be installed?
-
 # note: still need to do docker vs. machine check, so we can install
 # on machine exec no matter what & add new version to beginning of path
 # https://stackoverflow.com/questions/20010199/how-to-determine-if-a-process-runs-inside-lxc-docker
@@ -20,10 +13,9 @@ steps:
         install_latest () {
           curl https://sdk.cloud.google.com > gcloud-install.sh
 
-          bash gcloud-install.sh \
-            --install-dir=<<parameters.install-dir>>
+          bash gcloud-install.sh
 
-          export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
+          export PATH="$HOME/google-cloud-sdk/bin:$PATH"
 
           exec -l $SHELL
         }
