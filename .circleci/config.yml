@@ -13,14 +13,12 @@ commands:
       - gcp-cli/install
       - gcp-cli/initialize
 
-  install-versioned:
+  install-paramaterized:
     steps:
       - checkout
 
       # test orb commands
       - gcp-cli/install:
-          use-latest: false
-          sdk-version: 224.0.0
           install-dir: /usr/local/bin
 
       - gcp-cli/initialize
@@ -32,10 +30,10 @@ jobs:
     steps:
       - install-latest
 
-  install-default-versioned:
+  install-default-paramaterized:
     executor: gcp-cli/default
     steps:
-      - install-versioned
+      - install-paramaterized
 
   # google cloud image
   install-google-latest:
@@ -43,10 +41,10 @@ jobs:
     steps:
       - install-latest
 
-  install-google-versioned:
+  install-google-paramaterized:
     executor: gcp-cli/google
     steps:
-      - install-versioned
+      - install-paramaterized
 
   # machine executor
   install-machine-latest:
@@ -54,10 +52,10 @@ jobs:
     steps:
       - install-latest
 
-  install-machine-versioned:
+  install-machine-paramaterized:
     executor: gcp-cli/machine
     steps:
-      - install-versioned
+      - install-paramaterized
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
@@ -73,10 +71,10 @@ integration-master_filters: &integration-master_filters
     only: /master-.*/
 
 install-initialize_requires-dev: &install-initialize_requires-dev
-  [install-default-latest-dev, install-default-versioned-dev, install-google-latest-dev, install-google-versioned-dev, install-machine-latest-dev, install-machine-versioned-dev]
+  [install-default-latest-dev, install-default-paramaterized-dev, install-google-latest-dev, install-google-paramaterized-dev, install-machine-latest-dev, install-machine-paramaterized-dev]
 
 install-initialize_requires-master: &install-initialize_requires-master
-  [install-default-latest-master, install-default-versioned-master, install-google-latest-master, install-google-versioned-master, install-machine-latest-master, install-machine-versioned-master]
+  [install-default-latest-master, install-default-paramaterized-master, install-google-latest-master, install-google-paramaterized-master, install-machine-latest-master, install-machine-paramaterized-master]
 
 prod-deploy_requires: &prod-deploy_requires
   [install_initialize-default-master, install_initialize-google-master, install_initialize-machine-master]
@@ -124,8 +122,8 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - install-default-versioned:
-          name: install-default-versioned-dev
+      - install-default-paramaterized:
+          name: install-default-paramaterized-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
@@ -134,8 +132,8 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - install-google-versioned:
-          name: install-google-versioned-dev
+      - install-google-paramaterized:
+          name: install-google-paramaterized-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
@@ -144,8 +142,8 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - install-machine-versioned:
-          name: install-machine-versioned-dev
+      - install-machine-paramaterized:
+          name: install-machine-paramaterized-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
@@ -177,8 +175,8 @@ workflows:
           context: orb-publishing
           filters: *integration-master_filters
 
-      - install-default-versioned:
-          name: install-default-versioned-master
+      - install-default-paramaterized:
+          name: install-default-paramaterized-master
           context: orb-publishing
           filters: *integration-master_filters
 
@@ -187,8 +185,8 @@ workflows:
           context: orb-publishing
           filters: *integration-master_filters
 
-      - install-google-versioned:
-          name: install-google-versioned-master
+      - install-google-paramaterized:
+          name: install-google-paramaterized-master
           context: orb-publishing
           filters: *integration-master_filters
 
@@ -197,8 +195,8 @@ workflows:
           context: orb-publishing
           filters: *integration-master_filters
 
-      - install-machine-versioned:
-          name: install-machine-versioned-master
+      - install-machine-paramaterized:
+          name: install-machine-paramaterized-master
           context: orb-publishing
           filters: *integration-master_filters
 

@@ -2,20 +2,6 @@ description: |
   Install the gcloud CLI, if not available
 
 parameters:
-  use-latest:
-    type: boolean
-    default: true
-    description: >
-      Install the latest version of the CLI? If false, specify a version
-      below
-
-  sdk-version:
-    type: string
-    default: ""
-    description: >
-      Pick a version of the gcloud CLI to install:
-      https://console.cloud.google.com/storage/browser/cloud-sdk-release
-
   install-dir:
     type: string
     default: $HOME
@@ -28,90 +14,37 @@ parameters:
 
 steps:
   # https://cloud.google.com/sdk/docs/downloads-interactive#linux
-  - when:
-      condition: <<parameters.use-latest>>
-      steps:
-        - run:
-            name: Install latest gcloud CLI version, if not available
-            background: true
-            command: |
-              install_latest () {
-                curl https://sdk.cloud.google.com > gcloud-install.sh
+  - run:
+      name: Install latest gcloud CLI version, if not available
+      command: |
+        install_latest () {
+          curl https://sdk.cloud.google.com > gcloud-install.sh
 
-                bash gcloud-install.sh \
-                  --install-dir=<<parameters.install-dir>>
+          bash gcloud-install.sh \
+            --install-dir=<<parameters.install-dir>>
 
-                export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
+          export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
 
-                exec -l $SHELL
-              }
+          exec -l $SHELL
+        }
 
-              if grep 'docker\|lxc' /proc/1/cgroup; then
-                if [[ $(command -v gcloud) == "" ]]; then
-                  install_latest
-                else
-                  echo "gcloud CLI is already installed."
-                fi
-              else
-                echo "----------------------------------------------------------------------------------------------------"
-                echo "this is a machine executor job, overriding default installation of gcloud CLI"
-                echo "----------------------------------------------------------------------------------------------------"
-                install_latest
-              fi
-
-        - run:
-            name: sleep while install runs in background
-            command: sleep 80
-
-  # https://cloud.google.com/sdk/docs/downloads-versioned-archives
-  # https://console.cloud.google.com/storage/browser/cloud-sdk-release
-  - unless:
-      condition: <<parameters.use-latest>>
-      steps:
-        - run:
-            name: Install gcloud CLI v<<parameters.sdk-version>>, if not available
-            background: true
-            command: |
-              install_versioned () {
-                curl \
-                  https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz > \
-                  google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
-
-                tar -xzf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
-                rm -rf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
-
-                ./google-cloud-sdk/install.sh \
-                   --quiet
-
-                  # how to fix this ?
-                  # --install-dir=<<parameters.install-dir>>
-
-                export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
-
-                exec -l $SHELL
-              }
-
-              if grep 'docker\|lxc' /proc/1/cgroup; then
-                if [[ $(command -v gcloud) == "" ]]; then
-                  install_versioned
-                else
-                  echo "gcloud CLI is already installed."
-                fi
-              else
-                echo "----------------------------------------------------------------------------------------------------"
-                echo "this is a machine executor job, overriding default installation of gcloud CLI"
-                echo "----------------------------------------------------------------------------------------------------"
-                install_versioned
-              fi
-
-        - run:
-            name: sleep while install runs in background
-            command: sleep 80
+        if grep 'docker\|lxc' /proc/1/cgroup; then
+          if [[ $(command -v gcloud) == "" ]]; then
+            install_latest
+          else
+            echo "gcloud CLI is already installed."
+          fi
+        else
+          echo "----------------------------------------------------------------------------------------------------"
+          echo "this is a machine executor job, overriding default installation of gcloud CLI"
+          echo "----------------------------------------------------------------------------------------------------"
+          install_latest
+        fi
 
   - run:
       name: Run gcloud init
       command: |
-        gcloud init --console-only --quiet
+        gcloud init --console-only
 
   - run:
       name: Verify version
