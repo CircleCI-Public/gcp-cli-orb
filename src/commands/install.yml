@@ -38,7 +38,6 @@ steps:
                 curl https://sdk.cloud.google.com > gcloud-install.sh
 
                 bash gcloud-install.sh \
-                  --disable-prompts \
                   --install-dir=<<parameters.install-dir>>
 
                 export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
@@ -76,8 +75,10 @@ steps:
                 rm -rf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
 
                 ./google-cloud-sdk/install.sh \
-                  --disable-prompts \
-                  --install-dir=<<parameters.install-dir>>
+                   --quiet
+
+                  # how to fix this ?
+                  # --install-dir=<<parameters.install-dir>>
 
                 export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
 
