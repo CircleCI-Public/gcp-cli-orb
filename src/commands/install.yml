@@ -1,12 +1,13 @@
 description: |
   Install the gcloud CLI, if not available
 
-sdk-version:
-  type: string
-  default: "236.0.0"
-  description: >
-    Pick a version of the gcloud CLI to install:
-    https://console.cloud.google.com/storage/browser/cloud-sdk-release
+parameters:
+  sdk-version:
+    type: string
+    default: "236.0.0"
+    description: >
+      Pick a version of the gcloud CLI to install:
+      https://console.cloud.google.com/storage/browser/cloud-sdk-release
 
 # note: still need to do docker vs. machine check, so we can install
 # on machine exec no matter what & add new version to beginning of path
@@ -27,7 +28,7 @@ steps:
         ./google-cloud-sdk/install.sh \
            --quiet
 
-        export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
+        export PATH="$HOME/google-cloud-sdk/bin:$PATH"
 
         exec -l $SHELL
         }
