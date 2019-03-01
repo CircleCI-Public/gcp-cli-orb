@@ -4,20 +4,6 @@ orbs:
   gcp-cli: circleci/gcp-cli@dev:alpha
   orb-tools: circleci/orb-tools@8.3.0
 
-executors:
-  cli:
-    resource_class: small
-    docker:
-      - image: circleci/circleci-cli
-  lint-condo:
-    resource_class: small
-    docker:
-      - image: singapore/lint-condo
-  node:
-    resource_class: small
-    docker:
-      - image: circleci/node
-
 commands:
   install:
     steps:
@@ -28,20 +14,47 @@ commands:
       - run: gcloud -v
 
 jobs:
-  install-default:
+  # default executor
+  install-default-latest:
     executor: gcp-cli/default
     steps:
       - install
 
-  install-google:
+  install-default-versioned:
+    executor: gcp-cli/default
+    steps:
+      - install:
+          use-latest: false
+          sdk-version: 224.0.0
+          install-dir: /usr/local/bin
+
+  # google cloud image
+  install-google-latest:
     executor: gcp-cli/google
     steps:
       - install
 
-  install-machine:
+  install-google-versioned:
+    executor: gcp-cli/google
+    steps:
+      - install:
+          use-latest: false
+          sdk-version: 224.0.0
+          install-dir: /usr/local/bin
+
+  # machine executor
+  install-machine-latest:
     executor: gcp-cli/machine
     steps:
       - install
+
+  install-machine-versioned:
+    executor: gcp-cli/machine
+    steps:
+      - install:
+          use-latest: false
+          sdk-version: 224.0.0
+          install-dir: /usr/local/bin
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
@@ -56,8 +69,14 @@ integration-master_filters: &integration-master_filters
   tags:
     only: /master-.*/
 
+install-initialize_requires-dev: &install-initialize_requires-dev
+  [install-default-latest-dev, install-default-versioned-dev, install-google-latest-dev, install-google-versioned-dev, install-machine-latest-dev, install-machine-versioned-dev]
+
+install-initialize_requires-master: &install-initialize_requires-master
+  [install-default-latest-master, install-default-versioned-master, install-google-latest-master, install-google-versioned-master, install-machine-latest-master, install-machine-versioned-master]
+
 prod-deploy_requires: &prod-deploy_requires
-  [install-default-master, install-google-master, install-machine-master, install_initialize-default-master, install_initialize-google-master, install_initialize-machine-master]
+  [install_initialize-default-master, install_initialize-google-master, install_initialize-machine-master]
 
 workflows:
   lint_pack-validate_publish-dev:
@@ -97,18 +116,33 @@ workflows:
     jobs:
       # triggered by non-master branch commits
       # run all commands with all executors
-      - install-default:
-          name: install-default-dev
+      - install-default-latest:
+          name: install-default-latest-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - install-google:
-          name: install-google-dev
+      - install-default-versioned:
+          name: install-default-versioned-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - install-machine:
-          name: install-machine-dev
+      - install-google-latest:
+          name: install-google-latest-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      - install-google-versioned:
+          name: install-google-versioned-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      - install-machine-latest:
+          name: install-machine-latest-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      - install-machine-versioned:
+          name: install-machine-versioned-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
@@ -117,33 +151,51 @@ workflows:
           name: install_initialize-default-dev
           context: orb-publishing
           filters: *integration-dev_filters
+          requires: *install-initialize_requires-dev
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-google-dev
           executor: gcp-cli/google
           context: orb-publishing
           filters: *integration-dev_filters
+          requires: *install-initialize_requires-dev
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-machine-dev
           executor: gcp-cli/machine
           context: orb-publishing
           filters: *integration-dev_filters
+          requires: *install-initialize_requires-dev
 
       # triggered by master branch commits
       # run all commands with all executors
-      - install-default:
-          name: install-default-master
+      - install-default-latest:
+          name: install-default-latest-master
           context: orb-publishing
           filters: *integration-master_filters
 
-      - install-google:
-          name: install-google-master
+      - install-default-versioned:
+          name: install-default-versioned-master
           context: orb-publishing
           filters: *integration-master_filters
 
-      - install-machine:
-          name: install-machine-master
+      - install-google-latest:
+          name: install-google-latest-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - install-google-versioned:
+          name: install-google-versioned-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - install-machine-latest:
+          name: install-machine-latest-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - install-machine-versioned:
+          name: install-machine-versioned-master
           context: orb-publishing
           filters: *integration-master_filters
 
@@ -152,18 +204,21 @@ workflows:
           name: install_initialize-default-master
           context: orb-publishing
           filters: *integration-master_filters
+          requires: *install-initialize_requires-master
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-google-master
           executor: gcp-cli/google
           context: orb-publishing
           filters: *integration-master_filters
+          requires: *install-initialize_requires-master
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-machine-master
           executor: gcp-cli/machine
           context: orb-publishing
           filters: *integration-master_filters
+          requires: *install-initialize_requires-master
 
       # patch, minor, or major publishing
       - orb-tools/dev-promote-prod:
