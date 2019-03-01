@@ -90,7 +90,7 @@ steps:
                   echo "gcloud CLI is already installed."
                 fi
               else
-              	echo "----------------------------------------------------------------------------------------------------"
+                echo "----------------------------------------------------------------------------------------------------"
                 echo "this is a machine executor job, overriding default installation of gcloud CLI"
                 echo "----------------------------------------------------------------------------------------------------"
                 install_versioned
@@ -102,6 +102,6 @@ steps:
         gcloud init
 
   - run:
-  	  name: Verify version
-  	  command: |
-  	    gcloud version
+      name: Verify version
+      command: |
+        gcloud version
