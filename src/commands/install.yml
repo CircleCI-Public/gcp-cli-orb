@@ -42,6 +42,8 @@ steps:
                   --install-dir=<<parameters.install-dir>>
 
                 export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
+
+                exec -l $SHELL
               }
 
               if grep 'docker\|lxc' /proc/1/cgroup; then
@@ -66,7 +68,7 @@ steps:
             name: Install gcloud CLI v<<parameters.sdk-version>>, if not available
             command: |
               install_versioned () {
-                curl \
+                wget \
                   https://storage.cloud.google.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
 
                 tar -xzf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
@@ -77,6 +79,8 @@ steps:
                   --install-dir=<<parameters.install-dir>>
 
                 export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
+
+                exec -l $SHELL
               }
 
               if grep 'docker\|lxc' /proc/1/cgroup; then
@@ -93,7 +97,11 @@ steps:
               fi
 
   - run:
-      name: Run gcloud init, verify version
+      name: Run gcloud init
       command: |
         gcloud init
-        gcloud version
+
+  - run:
+  	  name: Verify version
+  	  command: |
+  	    gcloud version
