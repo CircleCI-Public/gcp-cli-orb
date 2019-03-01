@@ -1,6 +1,13 @@
 description: |
   Install the gcloud CLI, if not available
 
+sdk-version:
+  type: string
+  default: "236.0.0"
+  description: >
+    Pick a version of the gcloud CLI to install:
+    https://console.cloud.google.com/storage/browser/cloud-sdk-release
+
 # note: still need to do docker vs. machine check, so we can install
 # on machine exec no matter what & add new version to beginning of path
 # https://stackoverflow.com/questions/20010199/how-to-determine-if-a-process-runs-inside-lxc-docker
@@ -10,19 +17,24 @@ steps:
   - run:
       name: Install latest gcloud CLI version, if not available
       command: |
-        install_latest () {
-          curl https://sdk.cloud.google.com > gcloud-install.sh
+        curl \
+          https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz > \
+          google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
 
-          bash gcloud-install.sh
+        tar -xzf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
+        rm -rf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
 
-          export PATH="$HOME/google-cloud-sdk/bin:$PATH"
+        ./google-cloud-sdk/install.sh \
+           --quiet
 
-          exec -l $SHELL
+        export PATH="<<parameters.install-dir>>/google-cloud-sdk/bin:$PATH"
+
+        exec -l $SHELL
         }
 
         if grep 'docker\|lxc' /proc/1/cgroup; then
           if [[ $(command -v gcloud) == "" ]]; then
-            install_latest
+            install
           else
             echo "gcloud CLI is already installed."
           fi
@@ -30,7 +42,7 @@ steps:
           echo "----------------------------------------------------------------------------------------------------"
           echo "this is a machine executor job, overriding default installation of gcloud CLI"
           echo "----------------------------------------------------------------------------------------------------"
-          install_latest
+          install
         fi
 
   - run:
