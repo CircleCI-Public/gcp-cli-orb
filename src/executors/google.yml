@@ -1,0 +1,13 @@
+description: >
+  The official Google docker container with gcloud SDK pre-installed
+
+parameters:
+  sdk-version:
+    type: string
+    default: "latest"
+    description: >
+      What version of the Google Cloud SDK Docker image? For full
+      options, see https://hub.docker.com/r/google/cloud-sdk/tags
+
+docker:
+  - image: google/cloud-sdk:<<parameters.sdk-version>>
