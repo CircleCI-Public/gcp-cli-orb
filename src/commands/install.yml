@@ -61,7 +61,7 @@ steps:
 
         - run:
             name: sleep while install runs in background
-            command: sleep 60
+            command: sleep 80
 
   # https://cloud.google.com/sdk/docs/downloads-versioned-archives
   # https://console.cloud.google.com/storage/browser/cloud-sdk-release
@@ -106,12 +106,12 @@ steps:
 
         - run:
             name: sleep while install runs in background
-            command: sleep 60
+            command: sleep 80
 
   - run:
       name: Run gcloud init
       command: |
-        gcloud init
+        gcloud init --console-only --quiet
 
   - run:
       name: Verify version
