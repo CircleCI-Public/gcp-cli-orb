@@ -59,6 +59,10 @@ steps:
                 install_latest
               fi
 
+        - run:
+            name: sleep while install runs in background
+            command: sleep 60
+
   # https://cloud.google.com/sdk/docs/downloads-versioned-archives
   # https://console.cloud.google.com/storage/browser/cloud-sdk-release
   - unless:
@@ -99,6 +103,10 @@ steps:
                 echo "----------------------------------------------------------------------------------------------------"
                 install_versioned
               fi
+
+        - run:
+            name: sleep while install runs in background
+            command: sleep 60
 
   - run:
       name: Run gcloud init
