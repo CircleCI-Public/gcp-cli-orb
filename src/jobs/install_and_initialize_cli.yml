@@ -33,5 +33,3 @@ steps:
       gcloud-service-key: <<parameters.gcloud-service-key>>
       google-project-id: <<parameters.google-project-id>>
       google-compute-zone: <<parameters.google-compute-zone>>
-
-  - run: gcloud -v

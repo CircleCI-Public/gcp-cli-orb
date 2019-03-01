@@ -48,5 +48,4 @@ steps:
 
   - run:
       name: Print version
-      command: |
-        gcloud version
+      command: gcloud version
