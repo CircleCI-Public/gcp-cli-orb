@@ -68,8 +68,9 @@ steps:
             name: Install gcloud CLI v<<parameters.sdk-version>>, if not available
             command: |
               install_versioned () {
-                wget \
-                  https://storage.cloud.google.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
+                curl \
+                  https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz > \
+                  google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
 
                 tar -xzf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
                 rm -rf google-cloud-sdk-<<parameters.sdk-version>>-linux-x86_64.tar.gz
