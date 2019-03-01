@@ -1,20 +1,7 @@
 description: |
   Install the gcloud CLI, if not available
 
-parameters:
-  sdk-version:
-    type: string
-    default: "236.0.0"
-    description: >
-      Pick a version of the gcloud CLI to install:
-      https://console.cloud.google.com/storage/browser/cloud-sdk-release
-
-# note: still need to do docker vs. machine check, so we can install
-# on machine exec no matter what & add new version to beginning of path
-# https://stackoverflow.com/questions/20010199/how-to-determine-if-a-process-runs-inside-lxc-docker
-
 steps:
-  # https://cloud.google.com/sdk/docs/downloads-interactive#linux
   - run:
       name: Install latest gcloud CLI version, if not available
       command: |
@@ -57,11 +44,6 @@ steps:
           echo "----------------------------------------------------------------------------------------------------"
           install
         fi
-
-  - run:
-      name: Run gcloud init
-      command: |
-        gcloud init --console-only
 
   - run:
       name: Print version
