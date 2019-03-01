@@ -33,6 +33,7 @@ steps:
       steps:
         - run:
             name: Install latest gcloud CLI version, if not available
+            background: true
             command: |
               install_latest () {
                 curl https://sdk.cloud.google.com > gcloud-install.sh
@@ -65,6 +66,7 @@ steps:
       steps:
         - run:
             name: Install gcloud CLI v<<parameters.sdk-version>>, if not available
+            background: true
             command: |
               install_versioned () {
                 curl \
