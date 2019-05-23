@@ -69,6 +69,10 @@ install-initialize_requires-master: &install-initialize_requires-master
 prod-deploy_requires: &prod-deploy_requires
   [install_initialize-default-master, install_initialize-google-master, install_initialize-machine-master]
 
+install-post-steps: &install-post-steps
+  [run: gcloud --version]
+
+
 workflows:
   lint_pack-validate_publish-dev:
     jobs:
@@ -111,16 +115,19 @@ workflows:
           name: install-default-dev
           context: orb-publishing
           filters: *integration-dev_filters
+          post-steps: *install-post-steps
 
       - install-google:
           name: install-google-dev
           context: orb-publishing
           filters: *integration-dev_filters
+          post-steps: *install-post-steps
 
       - install-machine:
           name: install-machine-dev
           context: orb-publishing
           filters: *integration-dev_filters
+          post-steps: *install-post-steps
 
       # run job with all executors
       - gcp-cli/install_and_initialize_cli:
@@ -128,6 +135,7 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
           requires: *install-initialize_requires-dev
+          post-steps: *install-post-steps
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-google-dev
@@ -135,6 +143,7 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
           requires: *install-initialize_requires-dev
+          post-steps: *install-post-steps
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-machine-dev
@@ -142,6 +151,7 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
           requires: *install-initialize_requires-dev
+          post-steps: *install-post-steps
 
       # triggered by master branch commits
       # run all commands with all executors
@@ -149,16 +159,19 @@ workflows:
           name: install-default-master
           context: orb-publishing
           filters: *integration-master_filters
+          post-steps: *install-post-steps
 
       - install-google:
           name: install-google-master
           context: orb-publishing
           filters: *integration-master_filters
+          post-steps: *install-post-steps
 
       - install-machine:
           name: install-machine-master
           context: orb-publishing
           filters: *integration-master_filters
+          post-steps: *install-post-steps
 
       # run job with all executors
       - gcp-cli/install_and_initialize_cli:
@@ -166,6 +179,7 @@ workflows:
           context: orb-publishing
           filters: *integration-master_filters
           requires: *install-initialize_requires-master
+          post-steps: *install-post-steps
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-google-master
@@ -173,6 +187,7 @@ workflows:
           context: orb-publishing
           filters: *integration-master_filters
           requires: *install-initialize_requires-master
+          post-steps: *install-post-steps
 
       - gcp-cli/install_and_initialize_cli:
           name: install_initialize-machine-master
@@ -180,6 +195,7 @@ workflows:
           context: orb-publishing
           filters: *integration-master_filters
           requires: *install-initialize_requires-master
+          post-steps: *install-post-steps
 
       # patch, minor, or major publishing
       - orb-tools/dev-promote-prod:
