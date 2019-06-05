@@ -32,7 +32,7 @@ steps:
           $SUDO apt-get update && $SUDO apt-get -y install google-cloud-sdk
         }
 
-        if grep 'docker\|lxc' /proc/1/cgroup; then
+        if grep 'docker\|lxc' /proc/1/cgroup > /dev/null 2>&1; then
           if [[ $(command -v gcloud) == "" ]]; then
             install
           else
