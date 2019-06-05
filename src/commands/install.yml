@@ -46,6 +46,5 @@ steps:
           install
         fi
 
-  - run:
-      name: Print version
-      command: gcloud version
+        echo "Success! gcloud has been installed; displaying version information:"
+        gcloud version
