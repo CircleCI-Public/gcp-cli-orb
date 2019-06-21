@@ -102,6 +102,7 @@ workflows:
           context: orb-publishing
           ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
           tag: master
+          cleanup-tags: true
           requires: [orb-tools/publish-dev]
           filters:
             branches:
