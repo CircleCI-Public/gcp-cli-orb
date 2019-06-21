@@ -19,6 +19,10 @@ parameters:
     description: The Google compute zone to connect with via the gcloud CLI
 
 steps:
+  - orb-tools/check-env-var-param:
+      command-name: Checking whether required env vars are set to initialize gcloud CLI...
+      param: <<parameters.gcloud-service-key>>,<<parameters.google-project-id>>,<<parameters.google-compute-zone>>
+
   - run:
       name: Initialize gcloud CLI to connect to Google Cloud
       command: |
