@@ -9,14 +9,14 @@ parameters:
       for the Google project
 
   google-project-id:
-    description: The Google project ID to connect with via the gcloud CLI
     type: env_var_name
     default: GOOGLE_PROJECT_ID
+    description: The Google project ID to connect with via the gcloud CLI
 
   google-compute-zone:
-    description: The Google compute zone to connect with via the gcloud CLI
     type: env_var_name
     default: GOOGLE_COMPUTE_ZONE
+    description: The Google compute zone to connect with via the gcloud CLI
 
 steps:
   - run:

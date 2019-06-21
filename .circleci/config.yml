@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   gcp-cli: circleci/gcp-cli@dev:alpha
-  orb-tools: circleci/orb-tools@8.9.2
+  orb-tools: circleci/orb-tools@8.24.0
 
 commands:
   install:
@@ -201,6 +201,7 @@ workflows:
       - orb-tools/dev-promote-prod:
           name: dev-promote-patch
           context: orb-publishing
+          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
           orb-name: circleci/gcp-cli
           requires: *prod-deploy_requires
           filters:
@@ -212,6 +213,7 @@ workflows:
       - orb-tools/dev-promote-prod:
           name: dev-promote-minor
           context: orb-publishing
+          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
           orb-name: circleci/gcp-cli
           release: minor
           requires: *prod-deploy_requires
@@ -224,6 +226,7 @@ workflows:
       - orb-tools/dev-promote-prod:
           name: dev-promote-major
           context: orb-publishing
+          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
           orb-name: circleci/gcp-cli
           release: major
           requires: *prod-deploy_requires
