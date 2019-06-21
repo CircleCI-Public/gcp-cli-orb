@@ -4,4 +4,4 @@ description: |
   Install and configure the Google Cloud CLI (gcloud)
 
 orbs:
-  orb-tools: circleci/orb-tools@8.24.0
+  orb-tools: circleci/orb-tools@8.26.0
