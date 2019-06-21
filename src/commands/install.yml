@@ -10,7 +10,9 @@ steps:
 
           # Create an environment variable for the correct distribution
           if [[ $(command -v lsb_release) == "" ]]; then
-            $SUDO apt-get update && $SUDO apt-get -y install lsb-release
+            $SUDO apt-get update && \
+              $SUDO apt-get -y install lsb-release
+
             export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
           else
             export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
@@ -21,14 +23,15 @@ steps:
 
           # Import the Google Cloud public key
           if [[ $(command -v curl) == "" ]]; then
-            $SUDO apt-get update && $SUDO apt-get -y install curl
-            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
-          else
-            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
+            $SUDO apt-get update && \
+              $SUDO apt-get -y install curl
           fi
 
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
+
           # Update and install the Cloud SDK
-          $SUDO apt-get update && $SUDO apt-get -y install google-cloud-sdk
+          $SUDO apt-get update && \
+            $SUDO apt-get -y install google-cloud-sdk
         }
 
         if grep 'docker\|lxc' /proc/1/cgroup > /dev/null 2>&1; then
