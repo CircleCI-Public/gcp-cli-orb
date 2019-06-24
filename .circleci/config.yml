@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   gcp-cli: circleci/gcp-cli@dev:alpha
-  orb-tools: circleci/orb-tools@8.27.0
+  orb-tools: circleci/orb-tools@8.27.1
 
 commands:
   install:

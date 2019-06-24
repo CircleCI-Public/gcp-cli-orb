@@ -8,6 +8,8 @@ steps:
           # Set sudo to work whether logged in as root user or non-root user
           if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
+          $SUDO rm -rf /var/lib/apt/lists/*
+
           # Create an environment variable for the correct distribution
           if [[ $(command -v lsb_release) == "" ]]; then
             $SUDO apt-get update && \
