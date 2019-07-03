@@ -31,5 +31,6 @@ steps:
 
         # Initialize gcloud CLI
         gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+        gcloud auth configure-docker
         gcloud --quiet config set project $<<parameters.google-project-id>>
         gcloud --quiet config set compute/zone $<<parameters.google-compute-zone>>
