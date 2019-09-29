@@ -1,0 +1,34 @@
+description: Install the gcloud CLI as a step in a job so it can be used in subsequent steps
+
+usage:
+  version: 2.1
+
+  orbs:
+    gcp-cli: circleci/gcp-cli@1.0.0
+
+  jobs:
+    shipit:
+      docker:
+        - image: circleci/python:3.6.1 # or your preferred image
+
+      steps:
+        - gcp-cli/install #this is an orb command that will install the gcloud CLI
+        - checkout
+        - run: 
+            name: deploy
+            command: |
+              # copy the envars into a json and authenticate into the service account
+              echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json  
+              gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+
+              #deploy your
+              gcloud -q --project $GOOGLE_PROJECT_ID app deploy
+
+  workflows:
+    deploy_workflow:
+      jobs:
+        - shipit:
+              # Once you've created a service account, you can securely provide your project credentials
+              # through CircleCI Contexts https://circleci.com/docs/2.0/contexts/
+              # In this case `appContext` holds GCLOUD_SERVICE_KEY, GOOGLE_PROJECT_ID and GOOGLE_COMPUTE_ZONE
+              context: appContext 
