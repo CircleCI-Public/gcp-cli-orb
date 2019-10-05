@@ -4,15 +4,15 @@ description: >
 parameters:
   python-version:
     type: string
-    default: "2.7"
+    default: "3.7"
     description: >
       What version of Python? For full options, see
       https://hub.docker.com/r/circleci/python/tags
 
   debian-release:
     type: enum
-    enum: ["stretch", "jessie"]
-    default: "stretch"
+    enum: ["buster", "stretch", "jessie"]
+    default: "buster"
     description: >
       Which Debian release?
 
