@@ -20,10 +20,10 @@ jobs:
     steps:
       - install
 
-  install-default-paramaterized:
+  install-default-parameterized:
     executor: gcp-cli/default
     steps:
-      - install-paramaterized
+      - install-parameterized
 
   # google cloud image
   install-google:
@@ -31,10 +31,10 @@ jobs:
     steps:
       - install
 
-  install-google-paramaterized:
+  install-google-parameterized:
     executor: gcp-cli/google
     steps:
-      - install-paramaterized
+      - install-parameterized
 
   # machine executor
   install-machine:
@@ -42,10 +42,10 @@ jobs:
     steps:
       - install
 
-  install-machine-paramaterized:
+  install-machine-parameterized:
     executor: gcp-cli/machine
     steps:
-      - install-paramaterized
+      - install-parameterized
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
