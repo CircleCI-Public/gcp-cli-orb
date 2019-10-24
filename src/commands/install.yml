@@ -15,7 +15,7 @@ steps:
           if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
           cd ~/
           curl -s https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-<<parameters.version>>-linux-x86_64.tar.gz | tar xz
-          echo 'export PATH=~/google-cloud-sdk/path.bash.inc:$PATH' >> $BASH_ENV
+          echo 'source ~/google-cloud-sdk/path.bash.inc' >> $BASH_ENV
           source $BASH_ENV
         }
 
@@ -32,6 +32,6 @@ steps:
           sudo rm -rf /opt/google-cloud-sdk
           install
         fi
-
-        echo "Success! gcloud has been installed; displaying version information:"
-        gcloud version
+  - run:
+      name: GCloud version
+      command: gcloud version
