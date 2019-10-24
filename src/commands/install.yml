@@ -14,7 +14,7 @@ steps:
           # Set sudo to work whether logged in as root user or non-root user
           if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
           cd ~/
-          curl -s https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-<<parameters.version>>-linux-x86_64.tar.gz | tar xvz
+          curl -s https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-<<parameters.version>>-linux-x86_64.tar.gz | tar xz
           echo 'export PATH=~/google-cloud-sdk/path.bash.inc:$PATH' >> $BASH_ENV
           source $BASH_ENV
         }
