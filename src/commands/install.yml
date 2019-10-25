@@ -16,7 +16,6 @@ steps:
           cd ~/
           curl -s https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-<<parameters.version>>-linux-x86_64.tar.gz | tar xz
           echo 'source ~/google-cloud-sdk/path.bash.inc' >> $BASH_ENV
-          source $BASH_ENV
         }
 
         if grep 'docker\|lxc' /proc/1/cgroup > /dev/null 2>&1; then
