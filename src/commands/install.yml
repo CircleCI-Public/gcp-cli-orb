@@ -1,5 +1,11 @@
 description: Install the gcloud CLI, if not available
 
+parameters:
+  version:
+    type: string
+    default: "268.0.0"
+    description: "Version of the CLI to install. Must contain the full version number as it appears in the URL on this page: https://cloud.google.com/sdk/docs/downloads-versioned-archives"
+
 steps:
   - run:
       name: Install latest gcloud CLI version, if not available
@@ -7,33 +13,9 @@ steps:
         install () {
           # Set sudo to work whether logged in as root user or non-root user
           if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
-
-          $SUDO rm -rf /var/lib/apt/lists/*
-
-          # Create an environment variable for the correct distribution
-          if [[ $(command -v lsb_release) == "" ]]; then
-            $SUDO apt-get update && \
-              $SUDO apt-get -y install lsb-release
-
-            export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-          else
-            export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-          fi
-
-          # Add the Google Cloud SDK distribution URI as a package source
-          echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | $SUDO tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-
-          # Import the Google Cloud public key
-          if [[ $(command -v curl) == "" ]]; then
-            $SUDO apt-get update && \
-              $SUDO apt-get -y install curl
-          fi
-
-          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
-
-          # Update and install the Cloud SDK
-          $SUDO apt-get update && \
-            $SUDO apt-get -y install google-cloud-sdk
+          cd ~/
+          curl -s https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-<<parameters.version>>-linux-x86_64.tar.gz | tar xz
+          echo 'source ~/google-cloud-sdk/path.bash.inc' >> $BASH_ENV
         }
 
         if grep 'docker\|lxc' /proc/1/cgroup > /dev/null 2>&1; then
@@ -49,6 +31,6 @@ steps:
           sudo rm -rf /opt/google-cloud-sdk
           install
         fi
-
-        echo "Success! gcloud has been installed; displaying version information:"
-        gcloud version
+  - run:
+      name: GCloud version
+      command: gcloud version

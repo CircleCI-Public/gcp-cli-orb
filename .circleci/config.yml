@@ -1,51 +1,37 @@
 version: 2.1
 
+install-initialize_requires-dev: &install-initialize_requires-dev
+  [install-default-dev, install-google-dev, install-machine-dev]
+
+install-initialize_requires-master: &install-initialize_requires-master
+  [install-default-master, install-google-master, install-machine-master]
+
+prod-deploy_requires: &prod-deploy_requires
+  [install_initialize-default-master, install_initialize-google-master, install_initialize-machine-master]
+
+
 orbs:
   gcp-cli: circleci/gcp-cli@dev:alpha
   orb-tools: circleci/orb-tools@8.27.1
-
-commands:
-  install:
-    steps:
-      - checkout
-
-      # test orb commands
-      - gcp-cli/install
-      - gcp-cli/initialize
 
 jobs:
   # default executor
   install-default:
     executor: gcp-cli/default
     steps:
-      - install
-
-  install-default-parameterized:
-    executor: gcp-cli/default
-    steps:
-      - install-parameterized
+      - gcp-cli/install
 
   # google cloud image
   install-google:
     executor: gcp-cli/google
     steps:
-      - install
-
-  install-google-parameterized:
-    executor: gcp-cli/google
-    steps:
-      - install-parameterized
+      - gcp-cli/install
 
   # machine executor
   install-machine:
     executor: gcp-cli/machine
     steps:
-      - install
-
-  install-machine-parameterized:
-    executor: gcp-cli/machine
-    steps:
-      - install-parameterized
+      - gcp-cli/install
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
@@ -59,15 +45,6 @@ integration-master_filters: &integration-master_filters
     ignore: /.*/
   tags:
     only: /master-.*/
-
-install-initialize_requires-dev: &install-initialize_requires-dev
-  [install-default-dev, install-google-dev, install-machine-dev]
-
-install-initialize_requires-master: &install-initialize_requires-master
-  [install-default-master, install-google-master, install-machine-master]
-
-prod-deploy_requires: &prod-deploy_requires
-  [install_initialize-default-master, install_initialize-google-master, install_initialize-machine-master]
 
 install-post-steps: &install-post-steps
   [run: gcloud --version]
