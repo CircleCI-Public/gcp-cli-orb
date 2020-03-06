@@ -1,18 +1,25 @@
 version: 2.1
 
-install-initialize_requires-dev: &install-initialize_requires-dev
-  [install-default-dev, install-google-dev, install-machine-dev]
-
-install-initialize_requires-master: &install-initialize_requires-master
-  [install-default-master, install-google-master, install-machine-master]
+install-initialize_requires: &install-initialize_requires
+  [install-default, install-google, install-machine]
 
 prod-deploy_requires: &prod-deploy_requires
-  [install_initialize-default-master, install_initialize-google-master, install_initialize-machine-master]
-
+  [install_initialize-default, install_initialize-google, install_initialize-machine]
 
 orbs:
   gcp-cli: circleci/gcp-cli@dev:alpha
-  orb-tools: circleci/orb-tools@8.27.1
+  orb-tools: circleci/orb-tools@9.0
+
+# Pipeline parameters
+parameters:
+  # These pipeline parameters are required by the "trigger-integration-tests-workflow"
+  # job, by default.
+  run-integration-tests:
+    type: boolean
+    default: false
+  dev-orb-version:
+    type: string
+    default: "dev:alpha"
 
 jobs:
   # default executor
@@ -33,25 +40,12 @@ jobs:
     steps:
       - gcp-cli/install
 
-# yaml anchor filters
-integration-dev_filters: &integration-dev_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /integration-.*/
-
-integration-master_filters: &integration-master_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /master-.*/
-
 install-post-steps: &install-post-steps
   [run: gcloud --version]
 
-
 workflows:
   lint_pack-validate_publish-dev:
+    unless: << pipeline.parameters.run-integration-tests >>
     jobs:
       - orb-tools/lint
 
@@ -65,151 +59,56 @@ workflows:
           requires:
             - orb-tools/pack
 
-      - orb-tools/trigger-integration-workflow:
-          name: trigger-integration-dev
+      - orb-tools/trigger-integration-tests-workflow:
           context: orb-publishing
-          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
           requires: [orb-tools/publish-dev]
-          filters:
-            branches:
-              ignore: master
 
-      - orb-tools/trigger-integration-workflow:
-          name: trigger-integration-master
+  integration-tests_prod-release:
+    when: << pipeline.parameters.run-integration-tests >>
+    jobs:
+      - install-default:
+          context: orb-publishing
+          post-steps: *install-post-steps
+
+      - install-google:
+          context: orb-publishing
+          post-steps: *install-post-steps
+
+      - install-machine:
+          context: orb-publishing
+          post-steps: *install-post-steps
+
+      # run job with all executors
+      - gcp-cli/install_and_initialize_cli:
+          name: install_initialize-default
+          context: orb-publishing
+          requires: *install-initialize_requires
+          post-steps: *install-post-steps
+
+      - gcp-cli/install_and_initialize_cli:
+          name: install_initialize-google
+          executor: gcp-cli/google
+          context: orb-publishing
+          requires: *install-initialize_requires
+          post-steps: *install-post-steps
+
+      - gcp-cli/install_and_initialize_cli:
+          name: install_initialize-machine
+          executor: gcp-cli/machine
+          context: orb-publishing
+          requires: *install-initialize_requires
+          post-steps: *install-post-steps
+
+      - orb-tools/dev-promote-prod-from-commit-subject:
           context: orb-publishing
           ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
-          tag: master
-          cleanup-tags: true
-          requires: [orb-tools/publish-dev]
+          orb-name: circleci/gcp-cli
+          add-pr-comment: true
+          bot-token-variable: GHI_TOKEN
+          bot-user: cpe-bot
+          fail-if-semver-not-indicated: true
+          publish-version-tag: true
+          requires: *prod-deploy_requires
           filters:
             branches:
               only: master
-
-  integration-tests_prod-release:
-    jobs:
-      # triggered by non-master branch commits
-      # run all commands with all executors
-      - install-default:
-          name: install-default-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-          post-steps: *install-post-steps
-
-      - install-google:
-          name: install-google-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-          post-steps: *install-post-steps
-
-      - install-machine:
-          name: install-machine-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-          post-steps: *install-post-steps
-
-      # run job with all executors
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-default-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-          requires: *install-initialize_requires-dev
-          post-steps: *install-post-steps
-
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-google-dev
-          executor: gcp-cli/google
-          context: orb-publishing
-          filters: *integration-dev_filters
-          requires: *install-initialize_requires-dev
-          post-steps: *install-post-steps
-
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-machine-dev
-          executor: gcp-cli/machine
-          context: orb-publishing
-          filters: *integration-dev_filters
-          requires: *install-initialize_requires-dev
-          post-steps: *install-post-steps
-
-      # triggered by master branch commits
-      # run all commands with all executors
-      - install-default:
-          name: install-default-master
-          context: orb-publishing
-          filters: *integration-master_filters
-          post-steps: *install-post-steps
-
-      - install-google:
-          name: install-google-master
-          context: orb-publishing
-          filters: *integration-master_filters
-          post-steps: *install-post-steps
-
-      - install-machine:
-          name: install-machine-master
-          context: orb-publishing
-          filters: *integration-master_filters
-          post-steps: *install-post-steps
-
-      # run job with all executors
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-default-master
-          context: orb-publishing
-          filters: *integration-master_filters
-          requires: *install-initialize_requires-master
-          post-steps: *install-post-steps
-
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-google-master
-          executor: gcp-cli/google
-          context: orb-publishing
-          filters: *integration-master_filters
-          requires: *install-initialize_requires-master
-          post-steps: *install-post-steps
-
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-machine-master
-          executor: gcp-cli/machine
-          context: orb-publishing
-          filters: *integration-master_filters
-          requires: *install-initialize_requires-master
-          post-steps: *install-post-steps
-
-      # patch, minor, or major publishing
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-patch
-          context: orb-publishing
-          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
-          orb-name: circleci/gcp-cli
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-patch.*/
-
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-minor
-          context: orb-publishing
-          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
-          orb-name: circleci/gcp-cli
-          release: minor
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-minor.*/
-
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-major
-          context: orb-publishing
-          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
-          orb-name: circleci/gcp-cli
-          release: major
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-major.*/
