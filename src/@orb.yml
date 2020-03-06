@@ -3,5 +3,9 @@ version: 2.1
 description: |
   Install and configure the Google Cloud CLI (gcloud)
 
+display:
+  home_url: https://cloud.google.com/sdk
+  source_url: https://github.com/CircleCI-Public/gcp-cli-orb
+
 orbs:
   orb-tools: circleci/orb-tools@8.26.0
