@@ -18,10 +18,15 @@ parameters:
     default: GOOGLE_COMPUTE_ZONE
     description: The Google compute zone to connect with via the gcloud CLI
 
+  google-compute-region:
+    description: The Google compute region to connect with via the gcloud CLI
+    type: env_var_name
+    default: GOOGLE_COMPUTE_REGION
+
 steps:
   - orb-tools/check-env-var-param:
       command-name: Checking whether required env vars are set to initialize gcloud CLI...
-      param: <<parameters.gcloud-service-key>>,<<parameters.google-project-id>>,<<parameters.google-compute-zone>>
+      param: <<parameters.gcloud-service-key>>,<<parameters.google-project-id>>
 
   - run:
       name: Initialize gcloud CLI to connect to Google Cloud
@@ -32,4 +37,12 @@ steps:
         # Initialize gcloud CLI
         gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
         gcloud --quiet config set project $<<parameters.google-project-id>>
-        gcloud --quiet config set compute/zone $<<parameters.google-compute-zone>>
+
+        if [[ -n $<<parameters.google-compute-zone>> ]]; then
+          gcloud --quiet config set compute/zone $<<parameters.google-compute-zone>>
+        elif [[ -n $<<parameters.google-compute-region>> ]]; then
+          gcloud --quiet config set compute/region $<<parameters.google-compute-region>>
+        else
+          echo "ERROR: Set <<parameters.google-compute-zone>> or <<parameters.google-compute-region>> env variable" >&2
+          exit 1
+        fi
