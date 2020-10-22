@@ -1,5 +1,4 @@
-description: >
-  Install gcloud CLI and initialize to connect to Google Cloud
+description: Install gcloud CLI and initialize to connect to Google Cloud.
 
 executor: <<parameters.executor>>
 
