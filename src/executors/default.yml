@@ -1,20 +1,13 @@
-description: >
-  A debian based docker container to use when running the gcloud CLI
+description: The default executor is the CircleCI Python Convenience Image.
 
 parameters:
-  python-version:
+  version:
     type: string
-    default: "2.7"
-    description: >
-      What version of Python? For full options, see
-      https://hub.docker.com/r/circleci/python/tags
-
-  debian-release:
-    type: enum
-    enum: ["stretch", "jessie"]
-    default: "stretch"
-    description: >
-      Which Debian release?
+    default: "3.7"
+    description: |
+      Python version to use. Take into account the versions of Python available
+      from CircleCI (https://hub.docker.com/r/cimg/python/tags) as well as what
+      is supported by gcloud CLI itself (https://cloud.google.com/sdk/docs/install).
 
 docker:
-  - image: circleci/python:<<parameters.python-version>>-<<parameters.debian-release>>
+  - image: cimg/python:<<parameters.version>>

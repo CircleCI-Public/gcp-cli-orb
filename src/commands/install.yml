@@ -1,4 +1,8 @@
-description: Install the gcloud CLI, if not available
+description: |
+  Install the gcloud CLI. When installing within the Docker executor, the
+  install will only occur if the CLI isn't already installed. If installing in
+  a Linux machine image, it will remove the pre-installed version and instead
+  install the version specified by this orb.
 
 parameters:
   version:
@@ -32,5 +36,5 @@ steps:
           install
         fi
   - run:
-      name: GCloud version
+      name: "gcloud CLI version"
       command: gcloud version
