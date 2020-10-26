@@ -1,14 +1,14 @@
-description: >
+description: |
   CircleCI's machine executor:
   https://circleci.com/docs/2.0/executor-types/#using-machine
 
 parameters:
-  machine-image:
+  image:
     type: string
-    default: latest
-    description: >
-      What version of CircleCI's machine executor? For details, see
+    default: ubuntu-2004:202010-01
+    description: |
+      Which machine executor image to use. For details, see
       https://circleci.com/docs/2.0/configuration-reference/#machine
 
 machine:
-  image: circleci/classic:<<parameters.machine-image>>
+  image: <<parameters.image>>
