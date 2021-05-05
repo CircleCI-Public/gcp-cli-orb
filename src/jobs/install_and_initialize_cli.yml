@@ -10,6 +10,11 @@ parameters:
       Executor to use for this job. Defaults to this orb's default
       executor.
 
+  version:
+    type: string
+    default: "283.0.0"
+    description: "Version of the CLI to install. Must contain the full version number as it appears in the URL on this page: https://cloud.google.com/sdk/docs/downloads-versioned-archives"
+
   gcloud-service-key:
     description: The gcloud service key
     type: env_var_name
@@ -31,8 +36,8 @@ parameters:
     default: GOOGLE_COMPUTE_REGION
 
 steps:
-  - install
-
+  - install:
+      version: <<parameters.version>>
   - initialize:
       gcloud-service-key: <<parameters.gcloud-service-key>>
       google-project-id: <<parameters.google-project-id>>
