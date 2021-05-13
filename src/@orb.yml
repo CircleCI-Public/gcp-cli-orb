@@ -8,4 +8,4 @@ display:
   source_url: https://github.com/CircleCI-Public/gcp-cli-orb
 
 orbs:
-  orb-tools: circleci/orb-tools@8.26.0
+  orb-tools: circleci/orb-tools@9.3.1
