@@ -11,17 +11,23 @@ parameters:
   google-project-id:
     type: env_var_name
     default: GOOGLE_PROJECT_ID
-    description: The Google project ID to connect with via the gcloud CLI.
+    description: |
+      Name of environment variable storing the Google project ID to set as
+      default for the gcloud CLI.
 
   google-compute-zone:
     type: env_var_name
     default: GOOGLE_COMPUTE_ZONE
-    description: The Google compute zone to connect with via the gcloud CLI.
+    description: |
+      Name of environment variable storing the Google compute zone to set as
+      default for the gcloud CLI.
 
   google-compute-region:
-    description: The Google compute region to connect with via the gcloud CLI
     type: env_var_name
     default: GOOGLE_COMPUTE_REGION
+    description: |
+      Name of environment variable storing the Google compute region to set as
+      default for the gcloud CLI
 
 steps:
   - orb-tools/check-env-var-param:
@@ -40,9 +46,8 @@ steps:
 
         if [[ -n $<<parameters.google-compute-zone>> ]]; then
           gcloud --quiet config set compute/zone $<<parameters.google-compute-zone>>
-        elif [[ -n $<<parameters.google-compute-region>> ]]; then
+        fi
+
+        if [[ -n $<<parameters.google-compute-region>> ]]; then
           gcloud --quiet config set compute/region $<<parameters.google-compute-region>>
-        else
-          echo "ERROR: Set <<parameters.google-compute-zone>> or <<parameters.google-compute-region>> env variable" >&2
-          exit 1
         fi
