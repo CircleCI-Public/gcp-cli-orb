@@ -1,114 +1,37 @@
 version: 2.1
-
-install-initialize_requires: &install-initialize_requires
-  [install-default, install-google, install-machine]
-
-prod-deploy_requires: &prod-deploy_requires
-  [install_initialize-default, install_initialize-google, install_initialize-machine]
-
+setup: true
 orbs:
-  gcp-cli: circleci/gcp-cli@dev:alpha
-  orb-tools: circleci/orb-tools@9.0
+  orb-tools: circleci/orb-tools@11.1
+  shellcheck: circleci/shellcheck@3.1
 
-# Pipeline parameters
-parameters:
-  # These pipeline parameters are required by the "trigger-integration-tests-workflow"
-  # job, by default.
-  run-integration-tests:
-    type: boolean
-    default: false
-  dev-orb-version:
-    type: string
-    default: "dev:alpha"
-
-jobs:
-  # default executor
-  install-default:
-    executor: gcp-cli/default
-    steps:
-      - gcp-cli/install
-
-  # google cloud image
-  install-google:
-    executor: gcp-cli/google
-    steps:
-      - gcp-cli/install
-
-  # machine executor
-  install-machine:
-    executor: gcp-cli/machine
-    steps:
-      - gcp-cli/install
-
-install-post-steps: &install-post-steps
-  [run: gcloud --version]
+filters: &filters
+  tags:
+    only: /.*/
 
 workflows:
-  lint_pack-validate_publish-dev:
-    unless: << pipeline.parameters.run-integration-tests >>
+  lint-pack:
     jobs:
-      - orb-tools/lint
-
+      - orb-tools/lint:
+          filters: *filters
       - orb-tools/pack:
-          requires:
-            - orb-tools/lint
-
-      - orb-tools/publish-dev:
+          filters: *filters
+      - orb-tools/review:
+          exclude: RC009
+          filters: *filters
+      - shellcheck/check:
+          exclude: SC2148,SC2038,SC2086,SC2002,SC2016
+          filters: *filters
+      - orb-tools/publish:
           orb-name: circleci/gcp-cli
-          context: orb-publishing
+          vcs-type: << pipeline.project.type >>
           requires:
-            - orb-tools/pack
-
-      - orb-tools/trigger-integration-tests-workflow:
-          context: orb-publishing
-          requires: [orb-tools/publish-dev]
-
-  integration-tests_prod-release:
-    when: << pipeline.parameters.run-integration-tests >>
-    jobs:
-      - install-default:
-          context: orb-publishing
-          post-steps: *install-post-steps
-
-      - install-google:
-          context: orb-publishing
-          post-steps: *install-post-steps
-
-      - install-machine:
-          context: orb-publishing
-          post-steps: *install-post-steps
-
-      # run job with all executors
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-default
-          context: orb-publishing
-          requires: *install-initialize_requires
-          post-steps: *install-post-steps
-
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-google
-          executor: gcp-cli/google
-          context: orb-publishing
-          requires: *install-initialize_requires
-          post-steps: *install-post-steps
-
-      - gcp-cli/install_and_initialize_cli:
-          name: install_initialize-machine
-          executor: gcp-cli/machine
-          context: orb-publishing
-          requires: *install-initialize_requires
-          post-steps: *install-post-steps
-
-      - orb-tools/dev-promote-prod-from-commit-subject:
-          context: orb-publishing
-          ssh-fingerprints: 44:89:7a:9b:65:2e:04:1f:01:88:1a:b7:03:28:5e:09
-          orb-name: circleci/gcp-cli
-          add-pr-comment: true
-          bot-token-variable: GHI_TOKEN
-          bot-user: cpe-bot
-          fail-if-semver-not-indicated: true
-          publish-version-tag: true
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              only: master
+            [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
+          # Use a context to hold your publishing token.
+          context: orb-publisher
+          filters: *filters
+      # Triggers the next workflow in the Orb Development Kit.
+      - orb-tools/continue:
+          pipeline-number: << pipeline.number >>
+          vcs-type: << pipeline.project.type >>
+          requires: [orb-tools/publish]
+          filters: *filters
