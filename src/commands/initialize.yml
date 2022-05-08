@@ -54,7 +54,7 @@ steps:
         # Initialize gcloud CLI
         gcloud --quiet config set core/disable_usage_reporting true
         gcloud --quiet config set component_manager/disable_update_check true
-        
+
         PARAM_WORKLOAD_IDENTITY_POOL=$(eval echo "<<parameters.workload-identity-pool>>")
         PARAM_WORKLOAD_IDENTITY_SERVICE_ACCOUNT=$(eval echo "<<parameters.workload-identity-service-account>>")
 
@@ -62,7 +62,7 @@ steps:
           # Use workload identity
           echo $CIRCLE_OIDC_TOKEN > ${HOME}/oidc-token.txt
 
-          # Store 
+          # Store the credentials in a file and have it available to application
           GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud-cred-file.json
           echo "export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> $BASH_ENV
 
