@@ -1,0 +1,26 @@
+description: |
+  Setup the gcloud CLI and configure with Workload Identity.
+  Impersonate service accounts on GCP without storing keys on CircleCI and utilize short-term credentials instead.
+  For more information, see the CircleCI OIDC docs: https://circleci.com/docs/2.0/openid-connect-tokens
+
+usage:
+  version: 2.1
+
+  orbs:
+    gcp-cli: circleci/gcp-cli@2.1
+
+  jobs:
+    gcp-cli-example:
+      executor: gcp-cli/default
+      steps:
+        - checkout
+        - gcp-cli/initialize:
+            workload-identity-pool: projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/my-pool/providers/circleci
+            workload-identity-service-account: my-sa@PROJECT_ID.iam.gserviceaccount.com
+        - run: echo "Run your code here"
+
+  workflows:
+    gcp-cli:
+      jobs:
+        - gcp-cli-example:
+            context: gcp

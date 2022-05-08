@@ -8,6 +8,20 @@ parameters:
       Name of environment variable storing the full service key JSON file
       for the Google project.
 
+  workload-identity-pool:
+    type: string
+    default: ''
+    description: |
+      The workload identity pool provider resource name.
+      (projects/$PROJECT_NUMBER/locations/$REGION/workloadIdentityPools/$WORKLOAD_POOL_ID/providers/$PROVIDER_ID)
+
+  workload-identity-service-account:
+    type: string
+    default: ''
+    description: |
+      The email of the service account to impersonate using the
+      workload identity pool.
+
   google-project-id:
     type: env_var_name
     default: GOOGLE_PROJECT_ID
@@ -32,19 +46,48 @@ parameters:
 steps:
   - orb-tools/check-env-var-param:
       command-name: Checking whether required env vars are set to initialize gcloud CLI...
-      param: <<parameters.gcloud-service-key>>,<<parameters.google-project-id>>
+      param: <<parameters.google-project-id>>
 
   - run:
       name: Initialize gcloud CLI to connect to Google Cloud
       command: |
-        # Store service account
-        echo $<<parameters.gcloud-service-key>> > ${HOME}/gcloud-service-key.json
-
         # Initialize gcloud CLI
         gcloud --quiet config set core/disable_usage_reporting true
         gcloud --quiet config set component_manager/disable_update_check true
-        gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-        gcloud --quiet config set project $<<parameters.google-project-id>>
+        
+        PARAM_WORKLOAD_IDENTITY_POOL=$(eval echo "<<parameters.workload-identity-pool>>")
+        PARAM_WORKLOAD_IDENTITY_SERVICE_ACCOUNT=$(eval echo "<<parameters.workload-identity-service-account>>")
+
+        if [[ ! -z $PARAM_WORKLOAD_IDENTITY_POOL ]] && [[ ! -z $PARAM_WORKLOAD_IDENTITY_SERVICE_ACCOUNT ]]; then
+          # Use workload identity
+          echo $CIRCLE_OIDC_TOKEN > ${HOME}/oidc-token.txt
+
+          # Store 
+          GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud-cred-file.json
+          echo "export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> $BASH_ENV
+
+          # Generate credentials file and login
+          gcloud iam workload-identity-pools create-cred-config \
+            $PARAM_WORKLOAD_IDENTITY_POOL \
+            --service-account=$PARAM_WORKLOAD_IDENTITY_SERVICE_ACCOUNT \
+            --output-file=$GOOGLE_APPLICATION_CREDENTIALS \
+            --credential-source-file=${HOME}/oidc-token.txt
+          gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --project $<<parameters.google-project-id>>
+        elif [[ -n $<<parameters.gcloud-service-key>> ]]; then
+          # Verify there's a key
+          if [[ -z "$<<parameters.gcloud-service-key>>" ]]; then
+            echo "\$<<parameters.gcloud-service-key>> contains no value!"
+            exit 1
+          fi
+
+          # Store service account
+          echo $<<parameters.gcloud-service-key>> > ${HOME}/gcloud-service-key.json
+          gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+        else
+          echo "Either 'gcloud-service-key' or 'workload-identity-pool' and 'workload-identity-service-account'";
+          echo "  must be set."
+          exit 1
+        fi
 
         if [[ -n $<<parameters.google-compute-zone>> ]]; then
           gcloud --quiet config set compute/zone $<<parameters.google-compute-zone>>
