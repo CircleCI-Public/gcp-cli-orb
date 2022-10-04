@@ -14,4 +14,3 @@ usage:
             executor: gcp-cli/default
             version: 404.0.0 # optionally pass in the GCP CLI version
             context: myContext # store your gCloud service key via Contexts, or project-level environment variables
-            
