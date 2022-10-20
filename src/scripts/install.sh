@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-readonly base_dir="${CIRCLE_WORKING_DIRECTORY/\~/$HOME}"
-
 install () {
   # Set sudo to work whether logged in as root user or non-root user
   if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
