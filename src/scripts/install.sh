@@ -3,7 +3,7 @@
 install () {
   # Set sudo to work whether logged in as root user or non-root user
   if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
-  cd ~/
+  cd ~/ || return 1
   curl -Ss --retry 5 https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-"$ORB_VAL_VERSION"-linux-x86_64.tar.gz | tar xz
   echo 'source ~/google-cloud-sdk/path.bash.inc' >> "$BASH_ENV"
 }
