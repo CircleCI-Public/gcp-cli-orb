@@ -30,26 +30,11 @@ parameters:
       default for the gcloud CLI
 
 steps:
-  - orb-tools/check-env-var-param:
-      command-name: Checking whether required env vars are set to initialize gcloud CLI...
-      param: <<parameters.gcloud-service-key>>,<<parameters.google-project-id>>
-
   - run:
       name: Initialize gcloud CLI to connect to Google Cloud
-      command: |
-        # Store service account
-        echo $<<parameters.gcloud-service-key>> > ${HOME}/gcloud-service-key.json
-
-        # Initialize gcloud CLI
-        gcloud --quiet config set core/disable_usage_reporting true
-        gcloud --quiet config set component_manager/disable_update_check true
-        gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-        gcloud --quiet config set project $<<parameters.google-project-id>>
-
-        if [[ -n $<<parameters.google-compute-zone>> ]]; then
-          gcloud --quiet config set compute/zone $<<parameters.google-compute-zone>>
-        fi
-
-        if [[ -n $<<parameters.google-compute-region>> ]]; then
-          gcloud --quiet config set compute/region $<<parameters.google-compute-region>>
-        fi
+      environment:
+        ORB_ENV_SERVICE_KEY: <<parameters.gcloud-service-key>>
+        ORB_ENV_PROJECT_ID: <<parameters.google-project-id>>
+        ORB_ENV_COMPUTE_ZONE: <<parameters.google-compute-zone>>
+        ORB_ENV_COMPUTE_REGION: <<parameters.google-compute-region>>
+      command: << include(scripts/initialize.sh) >>
