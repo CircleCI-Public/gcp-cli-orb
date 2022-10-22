@@ -35,15 +35,6 @@ install() {
   curl --location --silent --fail --retry 3 https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-"$arg_version"-linux-x86_64.tar.gz | tar xz
   
   printf '%s\n' ". $base_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
-  # shellcheck disable=SC1090
-  . "$BASH_ENV"
-  
-  if ! command -v gcloud > /dev/null 2>&1; then
-    printf '%s\n' "Failed to install gcloud."
-    return 1
-  fi
-  
-  printf '%s\n' "Google Cloud SDK version: $(gcloud --version)"
 
   # If the envinronment is Alpine, remind the user to source $BASH_ENV in every step.
   if [ -f /etc/os-release ] && grep -q "Alpine" "/etc/os-release" ; then
@@ -51,13 +42,21 @@ install() {
     printf '%s\n' "Otherwise gcloud won't be available."
     printf '%s\n' "You can do this by adding the following line in the beginning of your command or as a pre-step:"
     printf '%s\n' "\"- run: . \$BASH_ENV\""
+
+    # Alpine also needs a workaround since Google's "path.bash.inc" doesn't work.
+    printf '%s\n' "export PATH=$base_dir/google-cloud-sdk/bin:$PATH" >> "$BASH_ENV"
   fi
+
+  # shellcheck disable=SC1090
+  . "$BASH_ENV"
+  if ! command -v gcloud > /dev/null 2>&1; then return 1; fi
+  printf '%s\n' "Google Cloud SDK version: $(gcloud --version)"
 }
 
 uninstall() {
 if ! command -v sudo > /dev/null 2>&1; then
   printf '%s\n' "sudo is required to uninstall the Google Cloud SDK."
-  printf '%s\n' "Please install it and try again."tar
+  printf '%s\n' "Please install it and try again."
   return 1
 fi
 
@@ -93,17 +92,15 @@ if command -v gcloud > /dev/null 2>&1; then
     printf '%s\n' "Uninstalling v${installed_version}..."
     
     if ! uninstall; then
-      readonly uninstall_error_code="$?"
       printf '%s\n' "Failed to uninstall the current version."
-      exit "$uninstall_error_code"
+      exit 1
     fi
     
     printf '%s\n' "Installing v${version}..."
 
     if ! install "$version"; then
-      readonly install_error_code="$?"
       printf '%s\n' "Failed to install the requested version."
-      exit "$install_error_code"
+      exit 1
     fi
   else
     printf '%s\n' "The version installed ($installed_version) matches the version requested ($version)."
@@ -113,8 +110,7 @@ else
   printf '%s\n' "Google Cloud SDK is not installed. Installing it."
 
   if ! install "$version"; then
-    readonly install_error_code="$?"
     printf '%s\n' "Failed to install the requested version."
-    exit "$install_error_code"
+    exit 1
   fi
 fi

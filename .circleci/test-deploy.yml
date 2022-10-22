@@ -30,6 +30,9 @@ jobs:
     steps:
       - gcp-cli/install:
           version: <<parameters.version>>
+      - run:
+          name: "Check if the CLI was installed"
+          command: gcloud --version || exit 1
 
   install-alpine:
     parameters:
@@ -44,6 +47,11 @@ jobs:
           command: apk add curl
       - gcp-cli/install:
           version: latest
+      - run:
+          name: "Check if the CLI was installed"
+          command: |
+            . "$BASH_ENV"
+            gcloud --version || exit 1
 
 executors:
   alpine:
@@ -66,10 +74,6 @@ workflows:
             parameters:
               version: [ latest, 371.0.0, 402.0.0]
           context: orb-publisher
-          pre-steps:
-            - run: |
-                touch "$BASH_ENV"
-                . "$BASH_ENV"
           post-steps: *install-post-steps
           filters: *filters
       # run job with all executors
