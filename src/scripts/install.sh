@@ -55,6 +55,13 @@ config_directory="$(gcloud info --format='value(config.paths.global_config_dir)'
 "$sudo" rm -rf "$config_directory" || return 1
 }
 
+# Check if curl is installed
+if ! command -v curl > /dev/null 2>&1; then
+  printf '%s\n' "curl is required to install the Google Cloud SDK."
+  printf '%s\n' "Please install it and try again."
+  exit 1
+fi
+
 # Figure out what is latest version available if "latest" is passed as an argument.
 version="$ORB_VAL_VERSION"
 [ "$version" = "latest" ] && fetch_latest_version
