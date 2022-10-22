@@ -30,15 +30,22 @@ fetch_latest_version() {
 install() {
   local arg_version="$1"
   [ -z "$arg_version" ] && printf '%s\n' "No version provided." && return 1
+
   cd "$base_dir" || return 1
   curl --location --silent --fail --retry 3 https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-"$arg_version"-linux-x86_64.tar.gz | tar xz
-  printf '%s\n' "source $base_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
+  
+  printf '%s\n' "export PATH=\"$base_dir/google-cloud-sdk/bin:$PATH\"" >> "$BASH_ENV"
+
+  # shellcheck disable=SC1090
+  . "$BASH_ENV"
+
+  printf '%s\n' "Google Cloud SDK version: $(gcloud --version)"
 }
 
 uninstall() {
 if ! command -v sudo > /dev/null 2>&1; then
   printf '%s\n' "sudo is required to uninstall the Google Cloud SDK."
-  printf '%s\n' "Please install it and try again."
+  printf '%s\n' "Please install it and try again."tar
   return 1
 fi
 
