@@ -48,7 +48,7 @@ jobs:
 executors:
   alpine:
     docker:
-      - image: alpine:latest
+      - image: python:3.7-alpine
 
 workflows:
   test-deploy:
