@@ -9,8 +9,8 @@ parameters:
     type: string
     default: "latest"
     description: >
-      The version of the gcloud CLI to install. 
-      If left to "latest", the latest version will be installed. 
+      The version of the gcloud CLI to install.
+      If left to "latest", the latest version will be installed.
       Otherwise, provide the full version number as it appears in the URL on this page: https://cloud.google.com/sdk/docs/downloads-versioned-archives"
 
 steps:

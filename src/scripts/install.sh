@@ -28,7 +28,7 @@ fetch_latest_version() {
 
 # $1: version
 install() {
-  local -r arg_version="$1"
+  local arg_version="$1"
   [ -z "$arg_version" ] && printf '%s\n' "No version provided." && return 1
   cd "$base_dir" || return 1
   curl --location --silent --fail --retry 3 https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-"$arg_version"-linux-x86_64.tar.gz | tar xz
