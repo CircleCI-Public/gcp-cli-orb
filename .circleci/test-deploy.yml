@@ -31,6 +31,20 @@ jobs:
       - gcp-cli/install:
           version: <<parameters.version>>
 
+  install-alpine:
+    parameters:
+      version:
+        type: string
+
+    executor: alpine
+    
+    steps:
+      - run:
+          name: Install curl
+          command: apk add curl
+      - gcp-cli/install:
+          version: latest
+
 executors:
   alpine:
     docker:
@@ -42,12 +56,18 @@ workflows:
       - install: 
           matrix:
             parameters:
-              executor: [ gcp-cli/default, gcp-cli/google, gcp-cli/machine, alpine ]
+              executor: [ gcp-cli/default, gcp-cli/google, gcp-cli/machine ]
               version: [ latest, 371.0.0, 402.0.0]
           context: orb-publisher
           post-steps: *install-post-steps
           filters: *filters
-
+      - install: 
+          matrix:
+            parameters:
+              version: [ latest, 371.0.0, 402.0.0]
+          context: orb-publisher
+          post-steps: *install-post-steps
+          filters: *filters
       # run job with all executors
       # - gcp-cli/install_and_initialize_cli:
       #     name: install_initialize-default
