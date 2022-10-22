@@ -19,6 +19,3 @@ steps:
       environment:
         ORB_VAL_VERSION: <<parameters.version>>
       command: << include(scripts/install.sh) >>
-  - run:
-      name: "gcloud CLI version"
-      command: gcloud version
