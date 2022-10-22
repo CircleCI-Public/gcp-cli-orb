@@ -40,7 +40,7 @@ install() {
   if [ -f /etc/os-release ] && grep -q "Alpine" "/etc/os-release" ; then
     printf '%s\n' "Alpine detected. Please make sure to source \$BASH_ENV in every step."
     printf '%s\n' "Otherwise gcloud won't be available."
-    printf '%s\n' "You can do this by adding the following line in the beginning of your command or as a pre-step:"
+    printf '%s\n' "You can do this by adding the following line in the beginning of your command:"
     printf '%s\n' "\"- run: . \$BASH_ENV\""
 
     # Alpine also needs a workaround since Google's "path.bash.inc" doesn't work.
