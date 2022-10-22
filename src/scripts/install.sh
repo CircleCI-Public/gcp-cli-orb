@@ -69,8 +69,11 @@ installation_directory="$(gcloud info --format='value(installation.sdk_root)')"
 local config_directory
 config_directory="$(gcloud info --format='value(config.paths.global_config_dir)')"
 
-"$sudo" rm -rf "$installation_directory" || return 1
-"$sudo" rm -rf "$config_directory" || return 1
+# shellcheck disable=SC2086 # $sudo is not a variable, it's a command.
+$sudo rm -rf "$installation_directory" || return 1
+
+# shellcheck disable=SC2086 # $sudo is not a variable, it's a command.
+$sudo rm -rf "$config_directory" || return 1
 }
 
 # Check if curl is installed
