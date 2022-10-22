@@ -5,7 +5,7 @@ description: |
 parameters:
   image:
     type: string
-    default: ubuntu-2004:202010-01
+    default: ubuntu-2204:current
     description: |
       Which machine executor image to use. For details, see
       https://circleci.com/docs/2.0/configuration-reference/#machine
