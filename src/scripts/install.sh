@@ -41,7 +41,7 @@ install() {
     printf '%s\n' "Alpine detected. Please make sure to source \$BASH_ENV in every step."
     printf '%s\n' "Otherwise gcloud won't be available."
     printf '%s\n' "You can do this by adding the following line in the beginning of your command:"
-    printf '%s\n' "\"- run: . \$BASH_ENV\""
+    printf '%s\n' "\". \$BASH_ENV\""
 
     # Alpine also needs a workaround since Google's "path.bash.inc" doesn't work.
     printf '%s\n' "export PATH=$base_dir/google-cloud-sdk/bin:$PATH" >> "$BASH_ENV"
