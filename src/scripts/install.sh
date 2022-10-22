@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# shellcheck disable=SC3043 # while "local" isn't POSIX, it's support in many shells. See: https://www.shellcheck.net/wiki/SC3043
+# shellcheck disable=SC3043 # while "local" isn't POSIX, it's supported in many shells. See: https://www.shellcheck.net/wiki/SC3043
 
 home="$(printf '%s\n' "$HOME" | sed 's/\//\\\//g')"
 readonly home
@@ -22,7 +22,7 @@ fetch_latest_version() {
     local latest_version
     latest_version="$(printf '%s\n' "$releases" | head -n 1)"
 
-    [ -z "$latest_version" ] && printf '%s\n' "Failed to resolve what is the latest version available." && return 1
+    [ -z "$latest_version" ] && printf '%s\n' "Couldn't find out what is the latest version available." && return 1
     version="$latest_version"
 }
 
