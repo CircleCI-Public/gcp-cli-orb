@@ -8,11 +8,22 @@ filters: &filters
   tags:
     only: /.*/
 
-install-initialize_requires: &install-initialize_requires
-  [install-default, install-google, install-machine]
-
-prod-deploy_requires: &prod-deploy_requires
-  [install_initialize-default, install_initialize-google, install_initialize-machine]
+publish_requirements:
+  &publish_requirements [
+    install-google-latest, 
+    install-google-402.0.0, 
+    install-google-371.0.0,
+    install-gcp-cli/machine-latest,
+    install-gcp-cli/machine-402.0.0,
+    install-gcp-cli/machine-371.0.0,
+    install-gcp-cli/default-latest,
+    install-gcp-cli/default-402.0.0,
+    install-gcp-cli/default-371.0.0,
+    install-alpine-latest,
+    install-alpine-402.0.0,
+    install-alpine-371.0.0,
+    orb-tools/pack
+  ]
 
 post-steps:
   - run: &check-cli-version
@@ -46,14 +57,14 @@ jobs:
     steps:
       - gcp-cli/install:
           version: <<parameters.version>>
-      - run: *check-cli-version   
+      - run: *check-cli-version
   install-alpine:
     parameters:
       version:
         type: string
 
     executor: "alpine"
-    
+
     steps:
       - run:
           name: Install curl
@@ -67,14 +78,14 @@ jobs:
         type: string
 
     executor: "gcp-cli/google"
-    
+
     steps:
       - run:
           name: Install sudo
           command: apt-get install sudo -y
       - gcp-cli/install:
           version: << parameters.version >>
-      - run: *check-cli-version 
+      - run: *check-cli-version
 
 executors:
   alpine:
@@ -84,23 +95,23 @@ executors:
 workflows:
   test-deploy:
     jobs:
-      - install: 
+      - install:
           matrix:
             parameters:
-              executor: [ gcp-cli/default, gcp-cli/machine ]
-              version: [ latest, 371.0.0, 402.0.0]
+              executor: [gcp-cli/default, gcp-cli/machine]
+              version: [latest, 371.0.0, 402.0.0]
           context: orb-publisher
           filters: *filters
-      - install-alpine: 
+      - install-alpine:
           matrix:
             parameters:
-              version: [ latest, 371.0.0, 402.0.0]
+              version: [latest, 371.0.0, 402.0.0]
           context: orb-publisher
           filters: *filters
-      - install-google: 
+      - install-google:
           matrix:
             parameters:
-              version: [ latest, 371.0.0, 402.0.0]
+              version: [latest, 371.0.0, 402.0.0]
           context: orb-publisher
           filters: *filters
       # run job with all executors
@@ -132,11 +143,7 @@ workflows:
           orb-name: circleci/gcp-cli
           vcs-type: << pipeline.project.type >>
           pub-type: production
-          requires:
-            # - install_initialize-default
-            # - install_initialize-google
-            # - install_initialize-machine
-            - orb-tools/pack
+          requires: *publish_requirements
           context: orb-publisher
           filters:
             branches:
