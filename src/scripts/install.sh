@@ -34,12 +34,24 @@ install() {
   cd "$base_dir" || return 1
   curl --location --silent --fail --retry 3 https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-"$arg_version"-linux-x86_64.tar.gz | tar xz
   
-  printf '%s\n' "export PATH=\"$base_dir/google-cloud-sdk/bin:$PATH\"" >> "$BASH_ENV"
-
+  printf '%s\n' ". $base_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
   # shellcheck disable=SC1090
   . "$BASH_ENV"
-
+  
+  if ! command -v gcloud > /dev/null 2>&1; then
+    printf '%s\n' "Failed to install gcloud."
+    return 1
+  fi
+  
   printf '%s\n' "Google Cloud SDK version: $(gcloud --version)"
+
+  # If the envinronment is Alpine, remind the user to source $BASH_ENV in every step.
+  if [ -f /etc/os-release ] && grep -q "Alpine" "/etc/os-release" ; then
+    printf '%s\n' "Alpine detected. Please make sure to source \$BASH_ENV in every step."
+    printf '%s\n' "Otherwise gcloud won't be available."
+    printf '%s\n' "You can do this by adding the following line in the beginning of your command or as a pre-step:"
+    printf '%s\n' "\"- run: . \$BASH_ENV\""
+  fi
 }
 
 uninstall() {

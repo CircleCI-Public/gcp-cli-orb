@@ -66,6 +66,8 @@ workflows:
             parameters:
               version: [ latest, 371.0.0, 402.0.0]
           context: orb-publisher
+          pre-steps:
+            - run: . "$BASH_ENV"
           post-steps: *install-post-steps
           filters: *filters
       # run job with all executors
