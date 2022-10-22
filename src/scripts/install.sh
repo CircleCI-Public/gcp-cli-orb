@@ -93,27 +93,15 @@ if command -v gcloud > /dev/null 2>&1; then
   if [ "$installed_version" != "$version" ]; then
     printf '%s\n' "The version installed ($installed_version) differs from the version requested ($version)."
     printf '%s\n' "Uninstalling v${installed_version}..."
-    
-    if ! uninstall; then
-      printf '%s\n' "Failed to uninstall the current version."
-      exit 1
-    fi
+    if ! uninstall; then printf '%s\n' "Failed to uninstall the current version."; exit 1; fi
     
     printf '%s\n' "Installing v${version}..."
-
-    if ! install "$version"; then
-      printf '%s\n' "Failed to install the requested version."
-      exit 1
-    fi
+    if ! install "$version"; then printf '%s\n' "Failed to install the requested version."; exit 1; fi
   else
     printf '%s\n' "The version installed ($installed_version) matches the version requested ($version)."
     printf '%s\n' "Skipping installation."
   fi
 else
   printf '%s\n' "Google Cloud SDK is not installed. Installing it."
-
-  if ! install "$version"; then
-    printf '%s\n' "Failed to install the requested version."
-    exit 1
-  fi
+  if ! install "$version"; then printf '%s\n' "Failed to install the requested version."; exit 1; fi
 fi
