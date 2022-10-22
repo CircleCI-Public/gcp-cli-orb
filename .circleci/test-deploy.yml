@@ -14,6 +14,25 @@ install-initialize_requires: &install-initialize_requires
 prod-deploy_requires: &prod-deploy_requires
   [install_initialize-default, install_initialize-google, install_initialize-machine]
 
+post-steps:
+  - run: &check-cli-version
+      name: "Check if the CLI was installed and the version is correct"
+      command: |
+        if [ << parameters.version >> = "latest" ]; then
+          gcloud version || exit 1
+        else
+          gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+        fi
+  - run: &check-cli-version-alpine
+      name: "Check if the CLI was installed and the version is correct"
+      command: |
+        . $BASH_ENV
+        if [ << parameters.version >> = "latest" ]; then
+          gcloud version || exit 1
+        else
+          gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+        fi
+
 jobs:
   install:
     parameters:
@@ -27,9 +46,7 @@ jobs:
     steps:
       - gcp-cli/install:
           version: <<parameters.version>>
-      - run:
-          name: "Check if the CLI was installed"
-          command: gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+      - run: *check-cli-version   
   install-alpine:
     parameters:
       version:
@@ -43,11 +60,7 @@ jobs:
           command: apk add curl
       - gcp-cli/install:
           version: << parameters.version >>
-      - run:
-          name: "Check if the CLI was installed"
-          command: |
-            . "$BASH_ENV"
-            gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+      - run: *check-cli-version-alpine
   install-google:
     parameters:
       version:
@@ -61,9 +74,7 @@ jobs:
           command: apt-get install sudo -y
       - gcp-cli/install:
           version: << parameters.version >>
-      - run:
-          name: "Check if the CLI was installed"
-          command: gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+      - run: *check-cli-version 
 
 executors:
   alpine:
