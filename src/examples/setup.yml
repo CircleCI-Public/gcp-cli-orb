@@ -1,4 +1,4 @@
-description: Install the gcloud CLI, if not available
+description: Install and initalize the gcloud CLI.
 
 usage:
   version: 2.1
