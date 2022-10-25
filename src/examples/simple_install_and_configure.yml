@@ -6,12 +6,12 @@ usage:
   orbs:
     gcp-cli: circleci/gcp-cli@2.4.1
 
-  jobs: 
+  jobs:
     use-gcp:
       executor: gcp-cli/default
       steps:
         - gcp-cli/setup:
-            version: 404.0.0 
+            version: 404.0.0
 
   workflows:
     install_and_configure_cli:
