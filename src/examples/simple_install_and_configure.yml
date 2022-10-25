@@ -6,11 +6,15 @@ usage:
   orbs:
     gcp-cli: circleci/gcp-cli@2.4.1
 
+  jobs: 
+    use-gcp:
+      executor: gcp-cli/default
+      steps:
+        - gcp-cli/setup:
+            version: 404.0.0 
+
   workflows:
     install_and_configure_cli:
       jobs:
-        - gcp-cli/install_and_initialize_cli:
-            # optionally determine executor to use
-            executor: gcp-cli/default
-            version: 404.0.0 # optionally pass in the GCP CLI version
+        - use-gcp: # optionally pass in the GCP CLI version
             context: myContext # store your gCloud service key via Contexts, or project-level environment variables
