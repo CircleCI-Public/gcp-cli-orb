@@ -10,19 +10,10 @@ filters: &filters
 
 publish_requirements:
   &publish_requirements [
-    install-google-latest, 
-    install-google-402.0.0, 
-    install-google-371.0.0,
-    install-gcp-cli/machine-latest,
-    install-gcp-cli/machine-402.0.0,
-    install-gcp-cli/machine-371.0.0,
-    install-gcp-cli/default-latest,
-    install-gcp-cli/default-402.0.0,
-    install-gcp-cli/default-371.0.0,
-    install-alpine-latest,
-    install-alpine-402.0.0,
-    install-alpine-371.0.0,
-    orb-tools/pack
+    test-executor-versions,
+    test-google-versions,
+    test-alpine-versions,
+    orb-tools/pack,
   ]
 
 post-steps:
@@ -97,6 +88,7 @@ workflows:
     jobs:
       - install:
           matrix:
+            alias: test-executor-versions
             parameters:
               executor: [gcp-cli/default, gcp-cli/machine]
               version: [latest, 371.0.0, 402.0.0]
@@ -104,12 +96,14 @@ workflows:
           filters: *filters
       - install-alpine:
           matrix:
+            alias: test-alpine-versions
             parameters:
               version: [latest, 371.0.0, 402.0.0]
           context: orb-publisher
           filters: *filters
       - install-google:
           matrix:
+            alias: test-google-versions
             parameters:
               version: [latest, 371.0.0, 402.0.0]
           context: orb-publisher
