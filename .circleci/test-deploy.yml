@@ -106,7 +106,9 @@ workflows:
           context: orb-publisher
           filters: *filters
 
-      - auth-oidc
+      - auth-oidc:
+          context: 
+            - gcp-cli-oidc
     
       - orb-tools/pack:
           filters: *filters
