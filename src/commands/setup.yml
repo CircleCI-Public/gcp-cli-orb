@@ -51,7 +51,7 @@ parameters:
     type: env_var_name
     default: GCP_WIP_PROVIDER_ID
     description: |
-      Environment variable containing OIDC configured workload identity pool provider ID is stored 
+      Environment variable containing OIDC configured workload identity pool provider ID is stored
 
   service_account_email:
     type: env_var_name
