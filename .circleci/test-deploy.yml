@@ -70,7 +70,7 @@ jobs:
     executor: gcp-cli/default
     steps: 
       - gcp-cli/setup: 
-          oidc_token_file_path: ~/oidc_config.json
+          oidc_token_file_path: ~/project/oidc_config.json
 
 executors:
   alpine:
