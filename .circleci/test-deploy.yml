@@ -71,7 +71,7 @@ jobs:
     steps: 
       - checkout
       - gcp-cli/setup: 
-          oidc_token_file_path: ~/project/oidc_config.json
+          oidc_token_file_path: ~/circleci_oidc_token
 
 executors:
   alpine:

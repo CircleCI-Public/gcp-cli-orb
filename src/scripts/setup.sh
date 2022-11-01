@@ -30,6 +30,7 @@ if [ -n "$oidc_file_path" ]; then
       "projects/${!ORB_ENV_PROJECT_ID}/locations/global/workloadIdentityPools/${!ORB_ENV_POOL_ID}/providers/${!ORB_ENV_POOL_PROVIDER_ID}" \
       --output-file="$cred_file_path"  \
       --service-account="${!ORB_ENV_SERVICE_EMAIL}" \
+      --credential-source-type="text" \
       --credential-source-file="$oidc_file_path"
 
   # Configure gcloud to leverage the generated credential configuration
