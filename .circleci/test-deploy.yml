@@ -42,20 +42,17 @@ jobs:
         type: executor
       version:
         type: string
-
     executor: <<parameters.executor>>
-
     steps:
       - gcp-cli/install:
           version: <<parameters.version>>
       - run: *check-cli-version
+
   install-alpine:
     parameters:
       version:
         type: string
-
     executor: "alpine"
-
     steps:
       - run:
           name: Install curl
@@ -63,13 +60,12 @@ jobs:
       - gcp-cli/install:
           version: << parameters.version >>
       - run: *check-cli-version-alpine
+
   install-google:
     parameters:
       version:
         type: string
-
     executor: "gcp-cli/google"
-
     steps:
       - run:
           name: Install sudo
@@ -77,6 +73,12 @@ jobs:
       - gcp-cli/install:
           version: << parameters.version >>
       - run: *check-cli-version
+
+  auth-oidc: 
+    executor: gcp-cli/default
+    steps: 
+      - gcp-cli/setup: 
+          oidc_token_file_path: ~/oidc_config.json
 
 executors:
   alpine:

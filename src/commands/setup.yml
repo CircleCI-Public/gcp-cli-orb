@@ -12,6 +12,7 @@ parameters:
       The version of the gcloud CLI to install.
       If left to "latest", the latest version will be installed.
       Otherwise, provide the full version number as it appears in the URL on this page: https://cloud.google.com/sdk/docs/downloads-versioned-archives
+
   gcloud_service_key:
     type: env_var_name
     default: GCLOUD_SERVICE_KEY
@@ -40,6 +41,33 @@ parameters:
       Name of environment variable storing the Google compute region to set as
       default for the gcloud CLI
 
+  workload_identity_pool_id:
+    type: env_var_name
+    default: GCP_WIP_ID # Do we want to use the GCP (from docs), gcloud, or google prefix
+    description: |
+      Environment variable containing OIDC configured workload identity pool is stored
+
+  workload_identity_pool_provider_id:
+    type: env_var_name
+    default: GCP_WIP_PROVIDER_ID
+    description: |
+      Environment variable containing OIDC configured workload identity pool provider ID is stored 
+
+  service_account_email:
+    type: env_var_name
+    default: GCP_SERVICE_ACCOUNT_EMAIL
+    description: Environment variable containing OIDC service account email
+
+  gcp_cred_config_file_path:
+    type: string
+    default: ~/gcp_cred_config.json
+    description: Output location of OIDC credentials
+
+  oidc_token_file_path:
+    type: string
+    default: ""
+    description: Define a token file path to authenticate with OIDC
+
 steps:
   - install:
       version: << parameters.version >>
@@ -50,4 +78,10 @@ steps:
         ORB_ENV_PROJECT_ID: <<parameters.google_project_id>>
         ORB_ENV_COMPUTE_ZONE: <<parameters.google_compute_zone>>
         ORB_ENV_COMPUTE_REGION: <<parameters.google_compute_region>>
+        # OIDC
+        ORB_VAL_CRED_FILE: <<parameters.gcp_cred_config_file_path>>
+        ORB_VAL_OIDC_FILE: <<parameters.oidc_token_file_path>>
+        ORB_ENV_POOL_ID: <<parameters.workload_identity_pool_id>>
+        ORB_ENV_POOL_PROVIDER_ID: <<parameters.workload_identity_pool_provider_id>>
+        ORB_ENV_SERVICE_EMAIL: <<parameters.service_account_email>>
       command: << include(scripts/setup.sh) >>
