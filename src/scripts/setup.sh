@@ -33,8 +33,8 @@ if [ -n "$oidc_file_path" ]; then
 
   # Configure gcloud to leverage the generated credential configuration
   gcloud auth login --brief --cred-file "$cred_file_path"
-  # Configure ADC
-  echo "export GOOGLE_APPLICATION_CREDENTIALS='$cred_file_path'" | tee -a "$BASH_ENV"
+  
+  echo "$CIRCLE_OIDC_TOKEN" >> CIRCLE_OIDC_TOKEN_FILE
 else
   gcloud auth activate-service-account --key-file="$HOME"/gcloud-service-key.json
 fi
