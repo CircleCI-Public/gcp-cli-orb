@@ -69,6 +69,7 @@ jobs:
   auth-oidc: 
     executor: gcp-cli/default
     steps: 
+      - checkout
       - gcp-cli/setup: 
           oidc_token_file_path: ~/project/oidc_config.json
 
