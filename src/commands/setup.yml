@@ -91,7 +91,6 @@ steps:
         ORB_VAL_USE_OIDC: <<parameters.use_oidc>>
         ORB_ENV_PROJECT_NUMBER: <<parameters.google_project_number>>
         ORB_EVAL_CRED_FILE: <<parameters.gcp_cred_config_file_path>>
-        ORB_EVAL_OIDC_FILE: <<parameters.oidc_token_file_path>>
         ORB_ENV_POOL_ID: <<parameters.workload_identity_pool_id>>
         ORB_ENV_POOL_PROVIDER_ID: <<parameters.workload_identity_pool_provider_id>>
         ORB_ENV_SERVICE_EMAIL: <<parameters.service_account_email>>

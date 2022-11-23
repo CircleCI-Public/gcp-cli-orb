@@ -20,6 +20,14 @@ gcloud --quiet config set component_manager/disable_update_check true
 
 # Use oidc
 if [ "$ORB_VAL_USE_OIDC" = 1 ]; then
+  echo "Authorizing using OIDC token"
+
+  if [ -z "$CIRCLE_OIDC_TOKEN" ]; then
+    echo "Ensure this job has a context to populate OIDC token"
+    echo "See more: https://circleci.com/docs/openid-connect-tokens/#openid-connect-id-token-availability"
+    exit 1
+  fi
+
   echo "$CIRCLE_OIDC_TOKEN" > "$HOME/oidc_token"
   # Store OIDC token in temp file
   gcloud iam workload-identity-pools create-cred-config \
