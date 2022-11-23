@@ -7,7 +7,6 @@ readonly compute_zone=${!ORB_ENV_COMPUTE_ZONE}
 readonly compute_region=${!ORB_ENV_COMPUTE_REGION}
 
 # Eval parameters
-oidc_project_number="${!ORB_ENV_PROJECT_NUMBER}"
 cred_file_path=$(eval "echo $ORB_EVAL_CRED_FILE")
 
 # Store service account
