@@ -7,7 +7,7 @@ readonly compute_zone=${!ORB_ENV_COMPUTE_ZONE}
 readonly compute_region=${!ORB_ENV_COMPUTE_REGION}
 
 # Eval parameters
-oidc_file_path=$(eval "echo $ORB_EVAL_OIDC_FILE")
+oidc_project_number="${!ORB_ENV_PROJECT_NUMBER}"
 cred_file_path=$(eval "echo $ORB_EVAL_CRED_FILE")
 
 # Store service account
@@ -17,21 +17,17 @@ printf '%s\n' "$service_key" > "$HOME"/gcloud-service-key.json
 gcloud --quiet config set core/disable_usage_reporting true
 gcloud --quiet config set component_manager/disable_update_check true
 
+
 # Use oidc
-
-
-# Determine credential source file by checking if an ENV exists as a file or a string.
-# If it's a file, then use it, or if it's a string then base64 decode it.
-
-if [ -n "$oidc_file_path" ]; then
-  echo "$CIRCLE_OIDC_TOKEN" > "$oidc_file_path"
+if [ "$ORB_VAL_USE_OIDC" = 1 ]; then
+  echo "$CIRCLE_OIDC_TOKEN" > "$HOME/oidc_token"
   # Store OIDC token in temp file
   gcloud iam workload-identity-pools create-cred-config \
-      "projects/${!ORB_ENV_PROJECT_ID}/locations/global/workloadIdentityPools/${!ORB_ENV_POOL_ID}/providers/${!ORB_ENV_POOL_PROVIDER_ID}" \
-      --output-file="$cred_file_path"  \
+      "projects/$oidc_project_number/locations/global/workloadIdentityPools/${!ORB_ENV_POOL_ID}/providers/${!ORB_ENV_POOL_PROVIDER_ID}/*" \
       --service-account="${!ORB_ENV_SERVICE_EMAIL}" \
       --credential-source-type="text" \
-      --credential-source-file="$oidc_file_path"
+      --credential-source-file="$HOME/oidc_token" \
+      --output-file="$cred_file_path"
 
   # Configure gcloud to leverage the generated credential configuration
   gcloud auth login --brief --cred-file "$cred_file_path"

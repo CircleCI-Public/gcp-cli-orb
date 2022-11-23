@@ -66,12 +66,12 @@ jobs:
           version: << parameters.version >>
       - run: *check-cli-version
 
-  auth-oidc: 
+  auth-oidc:
     executor: gcp-cli/default
-    steps: 
+    steps:
       - checkout
-      - gcp-cli/setup: 
-          oidc_token_file_path: ~/circleci_oidc_token
+      - gcp-cli/setup:
+          use_oidc: true
 
 executors:
   alpine:
@@ -107,9 +107,9 @@ workflows:
           filters: *filters
 
       - auth-oidc:
-          context: 
+          context:
             - gcp-cli-oidc
-    
+
       - orb-tools/pack:
           filters: *filters
 
@@ -117,7 +117,7 @@ workflows:
           orb-name: circleci/gcp-cli
           vcs-type: << pipeline.project.type >>
           pub-type: production
-          requires: 
+          requires:
             - test-executor-versions
             - test-google-versions
             - test-alpine-versions

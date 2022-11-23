@@ -39,34 +39,43 @@ parameters:
     default: GOOGLE_COMPUTE_REGION
     description: |
       Name of environment variable storing the Google compute region to set as
-      default for the gcloud CLI
+      default for the gcloud CLI.
+
+  # OIDC parameters
+
+  use_oidc:
+    type: boolean
+    default: false
+    description: Set to true to enable OIDC
+
+  google_project_number:
+    type: env_var_name
+    default: GOOGLE_PROJECT_NUMBER
+    description: |
+      Name of environment variable storing the Google project number
+      used to configure OIDC.
 
   workload_identity_pool_id:
     type: env_var_name
-    default: GCP_WIP_ID # Do we want to use the GCP (from docs), gcloud, or google prefix
+    default: OIDC_WIP_ID
     description: |
-      Environment variable containing OIDC configured workload identity pool is stored
+      Environment variable containing OIDC configured workload identity pool is stored.
 
   workload_identity_pool_provider_id:
     type: env_var_name
-    default: GCP_WIP_PROVIDER_ID
+    default: OIDC_WIP_PROVIDER_ID
     description: |
-      Environment variable containing OIDC configured workload identity pool provider ID is stored
+      Environment variable containing OIDC configured workload identity pool provider ID is stored.
 
   service_account_email:
     type: env_var_name
-    default: GCP_SERVICE_ACCOUNT_EMAIL
-    description: Environment variable containing OIDC service account email
+    default: OIDC_SERVICE_ACCOUNT_EMAIL
+    description: Environment variable containing OIDC service account email.
 
   gcp_cred_config_file_path:
     type: string
     default: ~/gcp_cred_config.json
-    description: Output location of OIDC credentials
-
-  oidc_token_file_path:
-    type: string
-    default: ""
-    description: Define a token file path to authenticate with OIDC
+    description: Output location of OIDC credentials.
 
 steps:
   - install:
@@ -79,6 +88,8 @@ steps:
         ORB_ENV_COMPUTE_ZONE: <<parameters.google_compute_zone>>
         ORB_ENV_COMPUTE_REGION: <<parameters.google_compute_region>>
         # OIDC
+        ORB_VAL_USE_OIDC: <<parameters.use_oidc>>
+        ORB_ENV_PROJECT_NUMBER: <<parameters.google_project_number>>
         ORB_EVAL_CRED_FILE: <<parameters.gcp_cred_config_file_path>>
         ORB_EVAL_OIDC_FILE: <<parameters.oidc_token_file_path>>
         ORB_ENV_POOL_ID: <<parameters.workload_identity_pool_id>>
