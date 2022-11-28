@@ -8,14 +8,6 @@ filters: &filters
   tags:
     only: /.*/
 
-publish_requirements:
-  &publish_requirements [
-    test-executor-versions,
-    test-google-versions,
-    test-alpine-versions,
-    orb-tools/pack,
-  ]
-
 post-steps:
   - run: &check-cli-version
       name: "Check if the CLI was installed and the version is correct"
@@ -42,20 +34,17 @@ jobs:
         type: executor
       version:
         type: string
-
     executor: <<parameters.executor>>
-
     steps:
       - gcp-cli/install:
           version: <<parameters.version>>
       - run: *check-cli-version
+
   install-alpine:
     parameters:
       version:
         type: string
-
     executor: "alpine"
-
     steps:
       - run:
           name: Install curl
@@ -63,13 +52,12 @@ jobs:
       - gcp-cli/install:
           version: << parameters.version >>
       - run: *check-cli-version-alpine
+
   install-google:
     parameters:
       version:
         type: string
-
     executor: "gcp-cli/google"
-
     steps:
       - run:
           name: Install sudo
@@ -77,6 +65,13 @@ jobs:
       - gcp-cli/install:
           version: << parameters.version >>
       - run: *check-cli-version
+
+  auth-oidc:
+    executor: gcp-cli/default
+    steps:
+      - checkout
+      - gcp-cli/setup:
+          use_oidc: true
 
 executors:
   alpine:
@@ -94,6 +89,7 @@ workflows:
               version: [latest, 371.0.0, 402.0.0]
           context: orb-publisher
           filters: *filters
+
       - install-alpine:
           matrix:
             alias: test-alpine-versions
@@ -101,6 +97,7 @@ workflows:
               version: [latest, 371.0.0, 402.0.0]
           context: orb-publisher
           filters: *filters
+
       - install-google:
           matrix:
             alias: test-google-versions
@@ -109,6 +106,10 @@ workflows:
           context: orb-publisher
           filters: *filters
 
+      - auth-oidc:
+          context:
+            - gcp-cli-oidc
+
       - orb-tools/pack:
           filters: *filters
 
@@ -116,7 +117,11 @@ workflows:
           orb-name: circleci/gcp-cli
           vcs-type: << pipeline.project.type >>
           pub-type: production
-          requires: *publish_requirements
+          requires:
+            - test-executor-versions
+            - test-google-versions
+            - test-alpine-versions
+            - orb-tools/pack
           context: orb-publisher
           filters:
             branches:
