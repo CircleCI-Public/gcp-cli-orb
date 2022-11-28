@@ -30,7 +30,7 @@ if [ "$ORB_VAL_USE_OIDC" = 1 ]; then
   echo "$CIRCLE_OIDC_TOKEN" > "$HOME/oidc_token"
   # Store OIDC token in temp file
   gcloud iam workload-identity-pools create-cred-config \
-      "projects/$project_id/locations/global/workloadIdentityPools/${!ORB_ENV_POOL_ID}/providers/${!ORB_ENV_POOL_PROVIDER_ID}" \
+      "projects/${!ORB_ENV_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${!ORB_ENV_POOL_ID}/providers/${!ORB_ENV_POOL_PROVIDER_ID}" \
       --service-account="${!ORB_ENV_SERVICE_EMAIL}" \
       --credential-source-type="text" \
       --credential-source-file="$HOME/oidc_token" \
