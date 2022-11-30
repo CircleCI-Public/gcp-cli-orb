@@ -32,7 +32,16 @@ install() {
   [ -z "$arg_version" ] && printf '%s\n' "No version provided." && return 1
 
   cd "$base_dir" || return 1
-  curl --location --silent --fail --retry 3 https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-"$arg_version"-linux-x86_64.tar.gz | tar xz
+
+  # after version 370, gcloud is called "cli" rather than "sdk"
+  major_version="$(echo "$1" | awk -F. '{print $1}')"
+  if [ "$major_version" -gt 370 ]; then
+      url_path_fixture="cli"
+  else
+      url_path_fixture="sdk"
+  fi
+
+  curl --location --silent --fail --retry 3 "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$arg_version-linux-x86_64.tar.gz" | tar xz
   printf '%s\n' ". $base_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
   # If the envinronment is Alpine, remind the user to source $BASH_ENV in every step.
