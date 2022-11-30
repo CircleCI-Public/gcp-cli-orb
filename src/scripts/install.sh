@@ -106,7 +106,7 @@ else
 fi
 
 # Install user provided gcloud components
-if [ -z "$ORB_VAL_COMPONENTS" ]; then
+if [ -n "$ORB_VAL_COMPONENTS" ]; then
   set -f
   for component in $ORB_VAL_COMPONENTS; do
       set -- "$@" "$component"
