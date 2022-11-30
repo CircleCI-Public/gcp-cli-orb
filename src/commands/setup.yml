@@ -87,7 +87,7 @@ parameters:
 steps:
   - install:
       version: << parameters.version >>
-      components:
+      components: << parameters.components >>
   - run:
       name: Initialize gcloud CLI to connect to Google Cloud
       environment:
