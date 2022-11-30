@@ -13,6 +13,13 @@ parameters:
       If left to "latest", the latest version will be installed.
       Otherwise, provide the full version number as it appears in the URL on this page: https://cloud.google.com/sdk/docs/downloads-versioned-archives
 
+  components:
+      type: string
+      default: ""
+      description: >
+        The list of gcloud components to install. Space separated.
+        See https://cloud.google.com/sdk/docs/components for additional info.
+
   gcloud_service_key:
     type: env_var_name
     default: GCLOUD_SERVICE_KEY
@@ -80,6 +87,7 @@ parameters:
 steps:
   - install:
       version: << parameters.version >>
+      components: << parameters.components >>
   - run:
       name: Initialize gcloud CLI to connect to Google Cloud
       environment:
