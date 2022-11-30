@@ -53,5 +53,3 @@ fi
 if [[ -n "$compute_region" ]]; then
   gcloud --quiet config set compute/region "$compute_region"
 fi
-
-echo "export ORB_GCP_CLI_SETUP=true" >> "$BASH_ENV"
