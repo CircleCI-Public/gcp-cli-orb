@@ -66,12 +66,20 @@ jobs:
           version: << parameters.version >>
       - run: *check-cli-version
 
+  install-components:
+    executor: gcp-cli/default
+    steps:
+      - checkout
+      - gcp-cli/setup:
+          components: kubectl package-go-module # smallest not install gcloud components
+
   auth-oidc:
     executor: gcp-cli/default
     steps:
       - checkout
       - gcp-cli/setup:
           use_oidc: true
+
 
 executors:
   alpine:
@@ -110,6 +118,8 @@ workflows:
           context:
             - gcp-cli-oidc
 
+      - install-components
+
       - orb-tools/pack:
           filters: *filters
 
@@ -121,6 +131,8 @@ workflows:
             - test-executor-versions
             - test-google-versions
             - test-alpine-versions
+            - install-components
+            - auth-oidc
             - orb-tools/pack
           context: orb-publisher
           filters:

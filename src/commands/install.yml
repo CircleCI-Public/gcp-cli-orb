@@ -12,10 +12,17 @@ parameters:
       The version of the gcloud CLI to install.
       If left to "latest", the latest version will be installed.
       Otherwise, provide the full version number as it appears in the URL on this page: https://cloud.google.com/sdk/docs/downloads-versioned-archives"
+  components:
+    type: string
+    default: ""
+    description: >
+      The list of gcloud components to install. Space separated.
+      See https://cloud.google.com/sdk/docs/components for additional info.
 
 steps:
   - run:
       name: Install latest gcloud CLI version, if not available
       environment:
         ORB_VAL_VERSION: <<parameters.version>>
+        ORB_VAL_COMPONENTS: <<parameters.components>>
       command: << include(scripts/install.sh) >>
