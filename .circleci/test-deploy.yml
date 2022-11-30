@@ -72,6 +72,7 @@ jobs:
       - checkout
       - gcp-cli/setup:
           components: kubectl package-go-module # smallest not install gcloud components
+      - run: gcloud components list | grep package-go-module || exit 1
 
   auth-oidc:
     executor: gcp-cli/default
@@ -79,7 +80,6 @@ jobs:
       - checkout
       - gcp-cli/setup:
           use_oidc: true
-
 
 executors:
   alpine:
