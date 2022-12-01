@@ -18,6 +18,7 @@ workflows:
       - orb-tools/review:
           filters: *filters
       - shellcheck/check:
+          exclude: 'SC2153'
           filters: *filters
       - orb-tools/publish:
           orb-name: circleci/gcp-cli

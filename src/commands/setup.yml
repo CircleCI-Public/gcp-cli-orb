@@ -1,0 +1,105 @@
+description: |
+  Install and initialize the gcloud CLI. When installing within the Docker executor, the
+  install will only occur if the CLI isn't already installed. If installing in
+  a Linux machine image, it will remove the pre_installed version and instead
+  install the version specified by this orb.
+
+parameters:
+  version:
+    type: string
+    default: "latest"
+    description: >
+      The version of the gcloud CLI to install.
+      If left to "latest", the latest version will be installed.
+      Otherwise, provide the full version number as it appears in the URL on this page: https://cloud.google.com/sdk/docs/downloads-versioned-archives
+
+  components:
+      type: string
+      default: ""
+      description: >
+        The list of gcloud components to install. Space separated.
+        See https://cloud.google.com/sdk/docs/components for additional info.
+
+  gcloud_service_key:
+    type: env_var_name
+    default: GCLOUD_SERVICE_KEY
+    description: |
+      Name of environment variable storing the full service key JSON file
+      for the Google project.
+
+  google_project_id:
+    type: env_var_name
+    default: GOOGLE_PROJECT_ID
+    description: |
+      Name of environment variable storing the Google project ID to set as
+      default for the gcloud CLI.
+
+  google_compute_zone:
+    type: env_var_name
+    default: GOOGLE_COMPUTE_ZONE
+    description: |
+      Name of environment variable storing the Google compute zone to set as
+      default for the gcloud CLI.
+
+  google_compute_region:
+    type: env_var_name
+    default: GOOGLE_COMPUTE_REGION
+    description: |
+      Name of environment variable storing the Google compute region to set as
+      default for the gcloud CLI.
+
+  # OIDC parameters
+
+  use_oidc:
+    type: boolean
+    default: false
+    description: Set to true to enable OIDC
+
+  google_project_number:
+    type: env_var_name
+    default: GOOGLE_PROJECT_NUMBER
+    description: |
+      Name of environment variable storing the Google project number
+      used to configure OIDC.
+
+  workload_identity_pool_id:
+    type: env_var_name
+    default: OIDC_WIP_ID
+    description: |
+      Environment variable containing OIDC configured workload identity pool is stored.
+
+  workload_identity_pool_provider_id:
+    type: env_var_name
+    default: OIDC_WIP_PROVIDER_ID
+    description: |
+      Environment variable containing OIDC configured workload identity pool provider ID is stored.
+
+  service_account_email:
+    type: env_var_name
+    default: OIDC_SERVICE_ACCOUNT_EMAIL
+    description: Environment variable containing OIDC service account email.
+
+  gcp_cred_config_file_path:
+    type: string
+    default: ~/gcp_cred_config.json
+    description: Output location of OIDC credentials.
+
+steps:
+  - install:
+      version: << parameters.version >>
+      components: << parameters.components >>
+  - run:
+      name: Initialize gcloud CLI to connect to Google Cloud
+      environment:
+        ORB_ENV_SERVICE_KEY: <<parameters.gcloud_service_key>>
+        ORB_ENV_PROJECT_ID: <<parameters.google_project_id>>
+        ORB_ENV_COMPUTE_ZONE: <<parameters.google_compute_zone>>
+        ORB_ENV_COMPUTE_REGION: <<parameters.google_compute_region>>
+        # OIDC
+        ORB_VAL_USE_OIDC: <<parameters.use_oidc>>
+        ORB_ENV_PROJECT_NUMBER: <<parameters.google_project_number>>
+        ORB_EVAL_CRED_FILE: <<parameters.gcp_cred_config_file_path>>
+        ORB_ENV_POOL_ID: <<parameters.workload_identity_pool_id>>
+        ORB_ENV_POOL_PROVIDER_ID: <<parameters.workload_identity_pool_provider_id>>
+        ORB_ENV_SERVICE_EMAIL: <<parameters.service_account_email>>
+      command: << include(scripts/setup.sh) >>
