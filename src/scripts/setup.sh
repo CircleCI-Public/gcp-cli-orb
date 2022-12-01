@@ -16,7 +16,6 @@ printf '%s\n' "$service_key" > "$HOME"/gcloud-service-key.json
 gcloud --quiet config set core/disable_usage_reporting true
 gcloud --quiet config set component_manager/disable_update_check true
 
-
 # Use oidc
 if [ "$ORB_VAL_USE_OIDC" = 1 ]; then
   echo "Authorizing using OIDC token"
