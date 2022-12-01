@@ -34,7 +34,7 @@ install() {
   cd "$base_dir" || return 1
 
   # after version 370, gcloud is called "cli" rather than "sdk"
-  major_version="$(echo "$1" | awk -F. '{print $1}')"
+  major_version="$(printf '%s\n' "$1" | awk -F. '{print $1}')"
   if [ "$major_version" -gt 370 ]; then
       url_path_fixture="cli"
   else
