@@ -8,7 +8,7 @@ fetch_latest_version() {
   release_notes="$(curl --location --silent --fail --retry 3 https://cloud.google.com/sdk/docs/release-notes)"
   release_notes_exit_code="$?"
 
-  [ "$release_notes_exit_code" -gt 0 ] && printf '%s\n' "Failed to get release notes" && return "$release_notes_exit_code"
+  [ "$release_notes_exit_code" -gt 0 ] && { printf '%s\n' "Failed to get release notes"; return "$release_notes_exit_code"; }
 
   local releases
   releases="$(printf '%s\n' "$release_notes" | grep -E '<h2 id=".*" data-text=".*">[0-9]+.[0-9]+.[0-9]+.*</h2>' | sed 's/<h2.*>\([0-9]*.[0-9]*.[0-9]*\).*<\/h2>/\1/')"
@@ -16,14 +16,14 @@ fetch_latest_version() {
   local latest_version
   latest_version="$(printf '%s\n' "$releases" | head -n 1)"
 
-  [ -z "$latest_version" ] && printf '%s\n' "Couldn't find out what is the latest version available." && return 1
+  [ -z "$latest_version" ] && { printf '%s\n' "Couldn't find out what is the latest version available."; return 1; }
   version="$latest_version"
 }
 
 # $1: version
 install() {
   local arg_version="$1"
-  [ -z "$arg_version" ] && printf '%s\n' "No version provided." && return 1
+  [ -z "$arg_version" ] && { printf '%s\n' "No version provided."; return 1; }
 
   local install_dir
   install_dir="$(mktemp -d)"
