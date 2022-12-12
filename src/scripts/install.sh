@@ -1,12 +1,6 @@
 #!/usr/bin/env sh
 # shellcheck disable=SC3043 # while "local" isn't POSIX, it's supported in many shells. See: https://www.shellcheck.net/wiki/SC3043
 
-home="$(printf '%s\n' "$HOME" | sed 's/\//\\\//g')"
-readonly home
-
-base_dir="$(printf '%s\n' "$CIRCLE_WORKING_DIRECTORY" | sed "s/~/$home/")"
-readonly base_dir
-
 fetch_latest_version() {
   local release_notes
   local release_notes_exit_code
@@ -14,7 +8,7 @@ fetch_latest_version() {
   release_notes="$(curl --location --silent --fail --retry 3 https://cloud.google.com/sdk/docs/release-notes)"
   release_notes_exit_code="$?"
 
-  [ "$release_notes_exit_code" -gt 0 ] && printf '%s\n' "Failed to get release notes" && return "$release_notes_exit_code"
+  [ "$release_notes_exit_code" -gt 0 ] && { printf '%s\n' "Failed to get release notes"; return "$release_notes_exit_code"; }
 
   local releases
   releases="$(printf '%s\n' "$release_notes" | grep -E '<h2 id=".*" data-text=".*">[0-9]+.[0-9]+.[0-9]+.*</h2>' | sed 's/<h2.*>\([0-9]*.[0-9]*.[0-9]*\).*<\/h2>/\1/')"
@@ -22,27 +16,26 @@ fetch_latest_version() {
   local latest_version
   latest_version="$(printf '%s\n' "$releases" | head -n 1)"
 
-  [ -z "$latest_version" ] && printf '%s\n' "Couldn't find out what is the latest version available." && return 1
+  [ -z "$latest_version" ] && { printf '%s\n' "Couldn't find out what is the latest version available."; return 1; }
   version="$latest_version"
 }
 
 # $1: version
 install() {
   local arg_version="$1"
-  [ -z "$arg_version" ] && printf '%s\n' "No version provided." && return 1
+  [ -z "$arg_version" ] && { printf '%s\n' "No version provided."; return 1; }
 
-  cd "$base_dir" || return 1
+  local install_dir
+  install_dir="$(mktemp -d)"
 
   # after version 370, gcloud is called "cli" rather than "sdk"
   major_version="$(echo "$1" | awk -F. '{print $1}')"
-  if [ "$major_version" -gt 370 ]; then
-      url_path_fixture="cli"
-  else
-      url_path_fixture="sdk"
-  fi
+  if [ "$major_version" -gt 370 ]; then url_path_fixture="cli"
+  else url_path_fixture="sdk"; fi
 
-  curl --location --silent --fail --retry 3 "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$arg_version-linux-x86_64.tar.gz" | tar xz
-  printf '%s\n' ". $base_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
+  curl --location --silent --fail --retry 3 --output "$install_dir/google-cloud-sdk.tar.gz" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$arg_version-linux-x86_64.tar.gz"
+  tar -xzf "$install_dir/google-cloud-sdk.tar.gz" -C "$install_dir"
+  printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
   # If the envinronment is Alpine, remind the user to source $BASH_ENV in every step.
   if [ -f /etc/os-release ] && grep -q "Alpine" "/etc/os-release"; then
@@ -52,7 +45,7 @@ install() {
     printf '%s\n' "\". \$BASH_ENV\""
 
     # Alpine also needs a workaround since Google's "path.bash.inc" doesn't work.
-    printf '%s\n' "export PATH=$base_dir/google-cloud-sdk/bin:$PATH" >> "$BASH_ENV"
+    printf '%s\n' "export PATH=$install_dir/google-cloud-sdk/bin:$PATH" >> "$BASH_ENV"
   fi
 
   # shellcheck disable=SC1090
