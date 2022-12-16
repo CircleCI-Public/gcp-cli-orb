@@ -66,6 +66,17 @@ jobs:
           version: << parameters.version >>
       - run: *check-cli-version
 
+  install-macos:
+    parameters:
+      version:
+        type: string
+    macos:
+      xcode: 14.1.0
+    steps:
+      - gcp-cli/install:
+          version: <<parameters.version>>
+      - run: *check-cli-version
+
   install-components:
     executor: gcp-cli/default
     steps:
@@ -114,6 +125,14 @@ workflows:
           context: orb-publisher
           filters: *filters
 
+      - install-macos:
+          matrix:
+            alias: test-macos-versions
+            parameters:
+              version: [latest, 399.0.0, 410.0.0]
+          context: orb-publisher
+          filters: *filters
+
       - auth-oidc:
           context:
             - gcp-cli-oidc
@@ -131,6 +150,7 @@ workflows:
             - test-executor-versions
             - test-google-versions
             - test-alpine-versions
+            - test-macos-versions
             - install-components
             - auth-oidc
             - orb-tools/pack
