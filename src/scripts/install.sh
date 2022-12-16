@@ -33,7 +33,21 @@ install() {
   if [ "$major_version" -gt 370 ]; then url_path_fixture="cli"
   else url_path_fixture="sdk"; fi
 
-  curl --location --silent --fail --retry 3 --output "$install_dir/google-cloud-sdk.tar.gz" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$arg_version-linux-x86_64.tar.gz"
+  os_family="linux"
+  case $(uname -s | tr '[:upper:]' '[:lower:]') in
+    linux)
+      os_family="linux"
+      ;;
+    darwin)
+      os_family="darwin"
+      ;;
+    *)
+      echo "Unsupported operating system."
+      exit 1
+      ;;
+  esac
+
+  curl --location --silent --fail --retry 3 --output "$install_dir/google-cloud-sdk.tar.gz" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$arg_version-$os_family-x86_64.tar.gz"
   tar -xzf "$install_dir/google-cloud-sdk.tar.gz" -C "$install_dir"
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
