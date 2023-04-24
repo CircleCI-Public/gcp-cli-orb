@@ -33,9 +33,9 @@ install() {
   if [ "$major_version" -gt 370 ]; then url_path_fixture="cli"
   else url_path_fixture="sdk"; fi
 
-  curl --location --silent --fail --retry 3 --output "$install_dir/google-cloud-sdk.tar.gz" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$arg_version-linux-x86_64.tar.gz"
-  tar -xzf "$install_dir/google-cloud-sdk.tar.gz" -C "$install_dir"
-  printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
+  curl --location --silent --fail --retry 3 --output "${install_dir}/google-cloud-sdk.tar.gz" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-${url_path_fixture}-${arg_version}-linux-x86_64.tar.gz"
+  tar -xzf "${install_dir}/google-cloud-sdk.tar.gz" -C "$install_dir"
+  printf '%s\n' ". ${install_dir}/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
   # If the envinronment is Alpine, remind the user to source $BASH_ENV in every step.
   if [ -f /etc/os-release ] && grep -q "Alpine" "/etc/os-release"; then
