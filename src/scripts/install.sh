@@ -102,7 +102,7 @@ download_with_retry() {
     else
       download_tries=$((download_tries + 1))
       printf "Download failed, retrying... (attempt: %d)\n" "$download_tries"
-      rm -rf "$install_directory"/*
+      rm -rf "${install_directory:?}"/*
     fi
   done
 
