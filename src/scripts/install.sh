@@ -89,19 +89,24 @@ download_and_extract() {
 }
 
 download_with_retry() {
+  local output_file="$1"
+  local url_path_fixture="$2"
+  local version="$3"
+  local install_directory="$4"
   local download_tries=0
-  local max_download_tries=2
+  local max_download_tries=3
 
-  while [ $download_tries -le $max_download_tries ]; do
-    if download_and_extract "$1" "$2" "$3" "$4"; then
+  while [ $download_tries -lt $max_download_tries ]; do
+    if download_and_extract "$output_file" "$url_path_fixture" "$version" "$install_directory"; then
       break
     else
       download_tries=$((download_tries + 1))
       printf "Download failed, retrying... (attempt: %d)\n" "$download_tries"
+      rm -rf "$install_directory"/*
     fi
   done
 
-  if [ $download_tries -gt $max_download_tries ]; then
+  if [ $download_tries -ge $max_download_tries ]; then
     printf "Failed to download and extract the tar file after %d attempts.\n" "$max_download_tries"
     return 1
   fi
