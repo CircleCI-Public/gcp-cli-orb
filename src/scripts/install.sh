@@ -33,8 +33,7 @@ install() {
   if [ "$major_version" -gt 370 ]; then url_path_fixture="cli"
   else url_path_fixture="sdk"; fi
 
-  curl --location --silent --fail --retry 3 --output "$install_dir/google-cloud-sdk.tar.gz" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$arg_version-linux-x86_64.tar.gz"
-  tar -xzf "$install_dir/google-cloud-sdk.tar.gz" -C "$install_dir"
+  download_with_retry "$install_dir/google-cloud-sdk.tar.gz" "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
   # If the envinronment is Alpine, remind the user to source $BASH_ENV in every step.
@@ -75,6 +74,42 @@ uninstall() {
 
   # shellcheck disable=SC2086 # $sudo is not a variable, it's a command.
   $sudo rm -rf "$config_directory" || return 1
+}
+
+download_and_extract() {
+  local output_file="$1"
+  local url_path_fixture="$2"
+  local version="$3"
+  local install_directory="$4"
+
+  curl --location --silent --fail --retry 3 --output "$output_file" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$version-linux-x86_64.tar.gz"
+  tar -xzf "$output_file" -C "$install_directory"
+
+  return $?
+}
+
+download_with_retry() {
+  local output_file="$1"
+  local url_path_fixture="$2"
+  local version="$3"
+  local install_directory="$4"
+  local download_tries=0
+  local max_download_tries=3
+
+  while [ $download_tries -lt $max_download_tries ]; do
+    if download_and_extract "$output_file" "$url_path_fixture" "$version" "$install_directory"; then
+      break
+    else
+      download_tries=$((download_tries + 1))
+      printf "Download failed, retrying... (attempt: %d)\n" "$download_tries"
+      rm -rf "${install_directory:?}"/*
+    fi
+  done
+
+  if [ $download_tries -ge $max_download_tries ]; then
+    printf "Failed to download and extract the tar file after %d attempts.\n" "$max_download_tries"
+    return 1
+  fi
 }
 
 # Check if curl is installed

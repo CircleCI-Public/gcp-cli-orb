@@ -116,9 +116,11 @@ workflows:
 
       - auth-oidc:
           context:
-            - gcp-cli-oidc
+            - cpe-gcp
 
-      - install-components
+      - install-components:
+          context:
+            - cpe-gcp
 
       - orb-tools/pack:
           filters: *filters
