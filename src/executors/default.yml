@@ -3,7 +3,7 @@ description: The default executor is the CircleCI Python Convenience Image.
 parameters:
   version:
     type: string
-    default: "3.7"
+    default: "3.8"
     description: |
       Python version to use. Take into account the versions of Python available
       from CircleCI (https://hub.docker.com/r/cimg/python/tags) as well as what
