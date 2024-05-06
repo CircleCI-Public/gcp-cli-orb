@@ -36,7 +36,7 @@ install() {
   download_with_retry "$install_dir/google-cloud-sdk.tar.gz" "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
-  # If the envinronment is Alpine, remind the user to source $BASH_ENV in every step.
+  # If the environment is Alpine, remind the user to source $BASH_ENV in every step.
   if [ -f /etc/os-release ] && grep -q "Alpine" "/etc/os-release"; then
     printf '%s\n' "Alpine detected. Please make sure to source \$BASH_ENV in every step."
     printf '%s\n' "Otherwise gcloud won't be available."
@@ -61,7 +61,7 @@ uninstall() {
   fi
 
   # Set sudo to work whether logged in as root user or non-root user.
-  if [ "$(id -u)" -eq 0 ]; then sudo=""; else sudo="sudo"; fi
+  if [ "$(id -u)" -eq 0 ] || [ "${machine}" = "windows" ]; then sudo=""; else sudo="sudo"; fi
 
   local installation_directory
   installation_directory="$(gcloud info --format='value(installation.sdk_root)')"
@@ -119,6 +119,21 @@ if ! command -v curl > /dev/null 2>&1; then
   exit 1
 fi
 
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=linux;;
+    Darwin*)    machine=mac;;
+    CYGWIN*)    machine=windows;;
+    MINGW*)     machine=windows;;
+    MSYS_NT*)   machine=windows;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
+SORT="sort -V"
+if [ "${machine}" = "windows" ]; then
+  SORT="sort //R" # windows ships with a different sort utility
+fi
+
 # Figure out what is latest version available if "latest" is passed as an argument.
 version="$ORB_VAL_VERSION"
 [ "$version" = "latest" ] && fetch_latest_version
@@ -128,7 +143,7 @@ if command -v gcloud > /dev/null 2>&1; then
 
   if [ "$installed_version" != "$version" ]; then
     # Figure out which version is older between the installed version and the requested version.
-    older_version="$(printf '%s\n%s\n' "$installed_version" "$version" | sort -V | head -n 1)"
+    older_version="$(printf '%s\n%s\n' "$installed_version" "$version" | $SORT | head -n 1)"
     
     # If the version requested is "latest" and the installed version is newer than the latest version available, skip installation.
     if [ "$ORB_VAL_VERSION" = "latest" ] && [ "$older_version" = "$version" ]; then
