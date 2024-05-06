@@ -54,14 +54,14 @@ install() {
 }
 
 uninstall() {
-  if ! command -v sudo > /dev/null 2>&1; then
+  if [ "${platform}" != "windows" ] && ! command -v sudo > /dev/null 2>&1; then
     printf '%s\n' "sudo is required to uninstall the Google Cloud SDK."
     printf '%s\n' "Please install it and try again."
     return 1
   fi
 
   # Set sudo to work whether logged in as root user or non-root user.
-  if [ "$(id -u)" -eq 0 ] || [ "${machine}" = "windows" ]; then sudo=""; else sudo="sudo"; fi
+  if [ "$(id -u)" -eq 0 ] || [ "${platform}" = "windows" ]; then sudo=""; else sudo="sudo"; fi
 
   local installation_directory
   installation_directory="$(gcloud info --format='value(installation.sdk_root)')"
@@ -121,18 +121,27 @@ fi
 
 unameOut="$(uname -s)"
 case "${unameOut}" in
-    Linux*)     machine=linux;;
-    Darwin*)    machine=mac;;
-    CYGWIN*)    machine=windows;;
-    MINGW*)     machine=windows;;
-    MSYS_NT*)   machine=windows;;
-    *)          machine="UNKNOWN:${unameOut}"
+    Linux*)     platform=linux;;
+    Darwin*)    platform=mac;;
+    CYGWIN*)    platform=windows;;
+    MINGW*)     platform=windows;;
+    MSYS_NT*)   platform=windows;;
+    *)          platform="UNKNOWN:${unameOut}"
 esac
 
-SORT="sort -V"
-if [ "${machine}" = "windows" ]; then
-  SORT="sort //R" # windows ships with a different sort utility
-fi
+printf "Detected platform: %s (%s)\n" "${platform}" "$(python --version)"
+
+sort_versions () {
+  local installed_version="$1"
+  local version="$2"
+
+  if [ "$platform" = "windows" ]; then
+    # this leans on the knowledge that node is bundled in the machine images
+    printf "%s %s" "$installed_version" "$version" | xargs npx semver | head -n 1
+  else
+    printf '%s\n%s\n' "$installed_version" "$version" | sort -V | head -n 1
+  fi
+}
 
 # Figure out what is latest version available if "latest" is passed as an argument.
 version="$ORB_VAL_VERSION"
@@ -143,8 +152,8 @@ if command -v gcloud > /dev/null 2>&1; then
 
   if [ "$installed_version" != "$version" ]; then
     # Figure out which version is older between the installed version and the requested version.
-    older_version="$(printf '%s\n%s\n' "$installed_version" "$version" | $SORT | head -n 1)"
-    
+    older_version="$(sort_versions "$installed_version" "$version")"
+
     # If the version requested is "latest" and the installed version is newer than the latest version available, skip installation.
     if [ "$ORB_VAL_VERSION" = "latest" ] && [ "$older_version" = "$version" ]; then
       printf '%s\n' "The version installed ($installed_version) is newer than the latest version listed in the release notes ($version)."
