@@ -183,5 +183,5 @@ if [ -n "$ORB_VAL_COMPONENTS" ]; then
   done
   set +f
 
-  gcloud components install "$@"
+  gcloud --quiet components install "$@"
 fi
