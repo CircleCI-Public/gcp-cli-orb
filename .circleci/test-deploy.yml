@@ -154,7 +154,7 @@ workflows:
 
       - install-win:
           matrix:
-            alias: test-executor-versions
+            alias: test-win-executor-versions
             parameters:
               executor: [windows-2019, windows-2022]
               version: [latest, 456.0.0, 460.0.0]
@@ -194,6 +194,7 @@ workflows:
           pub-type: production
           requires:
             - test-executor-versions
+            - test-win-executor-versions
             - test-google-versions
             - test-alpine-versions
             - install-components
