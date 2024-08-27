@@ -12,7 +12,8 @@ post-steps:
   - run: &check-cli-version
       name: "Check if the CLI was installed and the version is correct"
       command: |
-        exit 1
+        echo $PATH
+        which glcoud
         if [ << parameters.version >> = "latest" ]; then
           gcloud version || exit 1
         else
