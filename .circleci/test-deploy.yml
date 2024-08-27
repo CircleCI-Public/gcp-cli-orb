@@ -12,8 +12,6 @@ post-steps:
   - run: &check-cli-version
       name: "Check if the CLI was installed and the version is correct"
       command: |
-        echo "PATH: $PATH"
-        which gcloud
         if [ << parameters.version >> = "latest" ]; then
           gcloud version || exit 1
         else
@@ -23,6 +21,33 @@ post-steps:
       name: "Check if the CLI was installed and the version is correct"
       command: |
         . $BASH_ENV
+        if [ << parameters.version >> = "latest" ]; then
+          gcloud version || exit 1
+        else
+          gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+        fi
+  - run: &check-cli-version-bash
+      name: "Check if the CLI was installed and the version is correct"
+      shell: bash.exe
+      command: |
+        if [ << parameters.version >> = "latest" ]; then
+          gcloud version || exit 1
+        else
+          gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+        fi
+  - run: &check-cli-version-cmd
+      name: "Check if the CLI was installed and the version is correct"
+      shell: cmd.exe
+      command: |
+        if [ << parameters.version >> = "latest" ]; then
+          gcloud version || exit 1
+        else
+          gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+        fi
+  - run: &check-cli-version-powershell
+      name: "Check if the CLI was installed and the version is correct"
+      shell: powershell.exe
+      command: |
         if [ << parameters.version >> = "latest" ]; then
           gcloud version || exit 1
         else
@@ -41,6 +66,20 @@ jobs:
       - gcp-cli/install:
           version: <<parameters.version>>
       - run: *check-cli-version
+
+  install-win:
+    parameters:
+      executor:
+        type: executor
+      version:
+        type: string
+    executor: <<parameters.executor>>
+    steps:
+      - gcp-cli/install:
+          version: <<parameters.version>>
+      - run: *check-cli-version-bash
+      - run: *check-cli-version-cmd
+      - run: *check-cli-version-powershell
 
   install-alpine:
     parameters:
@@ -108,7 +147,16 @@ workflows:
           matrix:
             alias: test-executor-versions
             parameters:
-              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
+              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge]
+              version: [latest, 456.0.0, 460.0.0]
+          context: orb-publisher
+          filters: *filters
+
+      - install-win:
+          matrix:
+            alias: test-executor-versions
+            parameters:
+              executor: [windows-2019, windows-2022]
               version: [latest, 456.0.0, 460.0.0]
           context: orb-publisher
           filters: *filters
