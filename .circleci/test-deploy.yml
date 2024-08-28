@@ -122,7 +122,7 @@ jobs:
       - run: *check-cli-version
 
   install-components:
-    executor: gcp-cli/default
+    executor: <<parameters.executor>>
     steps:
       - checkout
       - run: python --version
@@ -131,7 +131,7 @@ jobs:
       - run: gcloud components list | grep package-go-module || exit 1
 
   auth-oidc:
-    executor: gcp-cli/default
+    executor: <<parameters.executor>> # gcp-cli/default
     steps:
       - checkout
       - run: python --version
@@ -192,10 +192,18 @@ workflows:
           filters: *filters
 
       - auth-oidc:
+          matrix:
+            alias: test-install-components
+            parameters:
+              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
           context:
             - cpe-gcp
 
       - install-components:
+          matrix:
+            alias: test-install-components
+            parameters:
+              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
           context:
             - cpe-gcp
 
