@@ -118,8 +118,7 @@ download_with_retry() {
 
 create_wrappers() {
   local download_directory="$1"
-  for COMMAND in $(ls "$download_directory"/google-cloud-sdk/bin); do
-  test -d "$download_directory"/google-cloud-sdk/bin/"$COMMAND" || continue
+  for COMMAND in {bootstrapping,docker-credential-gcloud,git-credential-gcloud.sh,bq,gcloud,gsutil}; do
   cat <<EOF > /c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"$COMMAND"
 #!/usr/bin/bash
   bash -c "/c/Program Files/Google/google-cloud-sdk/bin/$COMMAND \$@"
