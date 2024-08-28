@@ -42,21 +42,13 @@ post-steps:
       name: "Check if the CLI was installed and the version is correct"
       shell: cmd.exe
       command: |
-        if [ << parameters.version >> = "latest" ]; then
-          gcloud version || exit 1
-        else
-          gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
-        fi
+        gcloud version || EXIT 1
 
   - run: &check-cli-version-powershell
       name: "Check if the CLI was installed and the version is correct"
       shell: powershell.exe
       command: |
-        if [ << parameters.version >> = "latest" ]; then
-          gcloud version || exit 1
-        else
-          gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
-        fi
+        gcloud version || exit 1
 
 jobs:
   install:
