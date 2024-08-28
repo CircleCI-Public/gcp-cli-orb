@@ -122,6 +122,9 @@ jobs:
       - run: *check-cli-version
 
   install-components:
+    parameters:
+      executor:
+        type: executor
     executor: <<parameters.executor>>
     steps:
       - checkout
@@ -131,7 +134,10 @@ jobs:
       - run: gcloud components list | grep package-go-module || exit 1
 
   auth-oidc:
-    executor: <<parameters.executor>> # gcp-cli/default
+    parameters:
+      executor:
+        type: executor
+    executor: <<parameters.executor>>
     steps:
       - checkout
       - run: python --version
