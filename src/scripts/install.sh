@@ -27,9 +27,9 @@ install() {
 
   local install_dir
   if [ "$platform" = "windows" ]; then
-    install_dir="$(mktemp -d)"
-  else
     install_dir="/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
+  else
+    install_dir="$(mktemp -d)"
   fi
 
   # after version 370, gcloud is called "cli" rather than "sdk"
