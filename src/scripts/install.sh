@@ -117,9 +117,9 @@ download_with_retry() {
 
 create_wrappers() {
   local download_directory="$1"
-  cat <<EOF
+  cat <<EOF > /c/Users/circleci/AppData/Local/Microsoft/WindowsApp/gcloud
   bash -c "$download_directory/google-cloud-sdk/bin/gcloud"
-EOF  > /c/Users/circleci/AppData/Local/Microsoft/WindowsApp/gcloud
+EOF
 }
 
 # Check if curl is installed
