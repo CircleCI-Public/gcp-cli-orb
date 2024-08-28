@@ -50,6 +50,22 @@ post-steps:
       command: |
         bash gcloud version
 
+  - run: &check-gcloud-auth-gcr-bash
+      name: "Check if the CLI can generate docker configuration json file to pull images from gcr"
+      shell: bash.exe
+      command: |
+        gcloud auth configure-docker --quiet
+        test -f /c/Users/circleci/.docker.config.json
+        rm /c/Users/circleci/.docker.config.json
+
+  - run: &check-gcloud-auth-gcr-powershell
+      name: "Check if the CLI can generate docker configuration json file to pull images from gcr"
+      shell: powershell.exe
+      command: |
+        bash gcloud auth configure-docker --quiet
+        Test-Path C:\Users\circleci\.docker\config.json
+        rm C:\Users\circleci\.docker\config.json
+
 jobs:
   install:
     parameters:
@@ -76,6 +92,8 @@ jobs:
       - run: *check-cli-version-bash
       - run: *check-cli-version-cmd
       - run: *check-cli-version-powershell
+      - run: *check-gcloud-auth-gcr-bash
+      - run: *check-gcloud-auth-gcr-powershell
 
   install-alpine:
     parameters:
