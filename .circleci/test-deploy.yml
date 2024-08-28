@@ -55,8 +55,8 @@ post-steps:
       shell: bash.exe
       command: |
         gcloud auth configure-docker --quiet
-        test -f /c/Users/circleci/.docker.config.json
-        rm /c/Users/circleci/.docker.config.json
+        test -f /c/Users/circleci/.docker/config.json
+        rm /c/Users/circleci/.docker/config.json
 
   - run: &check-gcloud-auth-gcr-powershell
       name: "Check if the CLI can generate docker configuration json file to pull images from gcr"
