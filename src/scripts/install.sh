@@ -35,6 +35,7 @@ install() {
 
   download_with_retry "$install_dir/google-cloud-sdk.tar.gz" "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
   if [ "$platform" = "windows" ]; then
+    cp -R "$install_dir/google-cloud-sdk" "/c/Program Files/Google/"
     create_wrappers "$install_dir"
   fi
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
@@ -117,10 +118,13 @@ download_with_retry() {
 
 create_wrappers() {
   local download_directory="$1"
-  cat <<EOF > /c/Users/circleci/AppData/Local/Microsoft/WindowsApps/gcloud
-#! /usr/bin/bash
-  bash -c "$download_directory/google-cloud-sdk/bin/gcloud \$@"
+  for COMMAND in $(ls "$download_directory"/google-cloud-sdk/bin); do
+  test -d "$download_directory"/google-cloud-sdk/bin/"$COMMAND" || continue
+  cat <<EOF > /c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"$COMMAND"
+#!/usr/bin/bash
+  bash -c "/c/Program Files/Google/google-cloud-sdk/bin/$COMMAND \$@"
 EOF
+done
 }
 
 # Check if curl is installed
