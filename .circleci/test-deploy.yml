@@ -70,7 +70,7 @@ post-steps:
       name: "Builds a Docker image and publishes it to gcr"
       shell: bash.exe
       command: |
-        cat <<EOF > Dockerfile
+        cat \<<EOF > Dockerfile
         FROM alpine:edge
         RUN apk update
         RUN apk add curl
