@@ -17,6 +17,7 @@ post-steps:
         else
           gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
         fi
+
   - run: &check-cli-version-alpine
       name: "Check if the CLI was installed and the version is correct"
       command: |
@@ -26,6 +27,7 @@ post-steps:
         else
           gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
         fi
+
   - run: &check-cli-version-bash
       name: "Check if the CLI was installed and the version is correct"
       shell: bash.exe
@@ -35,6 +37,7 @@ post-steps:
         else
           gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
         fi
+
   - run: &check-cli-version-cmd
       name: "Check if the CLI was installed and the version is correct"
       shell: cmd.exe
@@ -44,6 +47,7 @@ post-steps:
         else
           gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
         fi
+
   - run: &check-cli-version-powershell
       name: "Check if the CLI was installed and the version is correct"
       shell: powershell.exe

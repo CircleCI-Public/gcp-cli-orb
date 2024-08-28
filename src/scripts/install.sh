@@ -34,6 +34,9 @@ install() {
   else url_path_fixture="sdk"; fi
 
   download_with_retry "$install_dir/google-cloud-sdk.tar.gz" "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
+  if [ "$platform" = "windows" ]; then
+    copy_to_directory_in_path "$install_dir" # needed
+  fi
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
   # If the environment is Alpine, remind the user to source $BASH_ENV in every step.
@@ -110,6 +113,12 @@ download_with_retry() {
     printf "Failed to download and extract the tar file after %d attempts.\n" "$max_download_tries"
     return 1
   fi
+}
+
+copy_to_directory_in_path() {
+  local download_directory="$1"
+  cp -R "$download_directory/google-cloud-sdk/bin/*" /c/Users/circleci/AppData/Local/Microsoft/WindowsApps/
+  cp -R "$download_directory/google-cloud-sdk/lib" /c/Users/circleci/AppData/Local/Microsoft/WindowsApps/
 }
 
 # Check if curl is installed
