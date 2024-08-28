@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# shellcheck disable=SC3043 # while "local" isn't POSIX, it's supported in many shells. See: https://www.shellcheck.net/wiki/SC3043
+# shellcheck disable=SC3043,SC3009 # while "local" isn't POSIX, it's supported in many shells. See: https://www.shellcheck.net/wiki/SC3043
 
 fetch_latest_version() {
   local release_notes
@@ -117,7 +117,6 @@ download_with_retry() {
 }
 
 create_wrappers() {
-  local download_directory="$1"
   for COMMAND in {bootstrapping,docker-credential-gcloud,git-credential-gcloud.sh,bq,gcloud,gsutil}; do
   cat <<EOF > /c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"$COMMAND"
 #!/usr/bin/bash
