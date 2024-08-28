@@ -119,7 +119,7 @@ create_wrappers() {
   local download_directory="$1"
   cat <<EOF
   bash -c "$download_directory/google-cloud-sdk/bin/gcloud"
-  EOF  > /c/Users/circleci/AppData/Local/Microsoft/WindowsApp/gcloud
+EOF  > /c/Users/circleci/AppData/Local/Microsoft/WindowsApp/gcloud
 }
 
 # Check if curl is installed
