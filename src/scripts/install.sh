@@ -34,9 +34,10 @@ install() {
   else url_path_fixture="sdk"; fi
 
   download_with_retry "$install_dir/google-cloud-sdk.tar.gz" "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
-  if [ "$platform" = "windows" ]; then
-    printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> ~/.bashrc
-  fi
+  printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> ~/.bashrc
+  printf '%s\n' ". $install_dir/google-cloud-sdk/path.fish.inc" >> ~/.fishrc
+  printf '%s\n' ". $install_dir/google-cloud-sdk/path.zsh.inc" >> ~/.zshrc
+  printf '%s\n' "export PATH=$PATH:$install_dir/google-cloud-sdk/bin" >> ~/.profile
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
   # If the environment is Alpine, remind the user to source $BASH_ENV in every step.
