@@ -66,6 +66,24 @@ post-steps:
         Test-Path C:\Users\circleci\.docker\config.json
         rm C:\Users\circleci\.docker\config.json
 
+  - run: &push-and-pull-docker-image
+      name: "Builds a Docker image and publishes it to gcr"
+      shell: bash.exe
+      command: |
+        cat <<EOF > Dockerfile
+FROM alpine:edge
+RUN apk update
+RUN apk add curl
+CMD ["curl", "--version"]
+EOF
+        docker build . -t gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest
+        gcloud auth configure-docker --quiet
+        docker push gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest
+        docker image prune -af
+        docker pull gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest
+        docker image prune -af
+        gcloud container images delete gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest --quiet
+
 jobs:
   install:
     parameters:
@@ -128,10 +146,10 @@ jobs:
     executor: <<parameters.executor>>
     steps:
       - checkout
-      - run: python --version
       - gcp-cli/setup:
           components: kubectl package-go-module # smallest not install gcloud components
       - run: gcloud components list | grep package-go-module || exit 1
+      - run: *push-and-pull-docker-image
 
   auth-oidc:
     parameters:
@@ -140,9 +158,10 @@ jobs:
     executor: <<parameters.executor>>
     steps:
       - checkout
-      - run: python --version
       - gcp-cli/setup:
           use_oidc: true
+      - run: *check-cli-version
+      - run: *push-and-pull-docker-image
 
 executors:
   alpine:
