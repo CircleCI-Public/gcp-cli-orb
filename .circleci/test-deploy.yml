@@ -71,11 +71,11 @@ post-steps:
       shell: bash.exe
       command: |
         cat <<EOF > Dockerfile
-FROM alpine:edge
-RUN apk update
-RUN apk add curl
-CMD ["curl", "--version"]
-EOF
+        FROM alpine:edge
+        RUN apk update
+        RUN apk add curl
+        CMD ["curl", "--version"]
+        EOF
         docker build . -t gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest
         gcloud auth configure-docker --quiet
         docker push gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest
