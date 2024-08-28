@@ -225,8 +225,8 @@ workflows:
             - test-win-executor-versions
             - test-google-versions
             - test-alpine-versions
-            - install-components
-            - auth-oidc
+            - test-install-components
+            - test-auth-oidc
             - orb-tools/pack
           context: orb-publisher
           filters:
