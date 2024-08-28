@@ -35,10 +35,7 @@ install() {
 
   download_with_retry "$install_dir/google-cloud-sdk.tar.gz" "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
   if [ "$platform" = "windows" ]; then
-    #cp -R "$install_dir"/google-cloud-sdk/bin/* "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
-    #cp -R "$install_dir"/google-cloud-sdk/lib "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
-    #cp -R "$install_dir"/google-cloud-sdk/platform "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
-    printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> ~/.profile
+    printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> ~/.bashrc
   fi
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
