@@ -26,7 +26,7 @@ install() {
   [ -z "$arg_version" ] && { printf '%s\n' "No version provided."; return 1; }
 
   local install_dir
-  install_dir="/tmp/google/"
+  install_dir="$(mktemp -d)"
 
   # after version 370, gcloud is called "cli" rather than "sdk"
   major_version="$(echo "$1" | awk -F. '{print $1}')"
