@@ -199,7 +199,7 @@ workflows:
 
       - auth-oidc:
           matrix:
-            alias: test-install-components
+            alias: test-auth-oidc
             parameters:
               executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
           context:
