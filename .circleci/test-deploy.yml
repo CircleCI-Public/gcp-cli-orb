@@ -48,7 +48,7 @@ post-steps:
       name: "Check if the CLI was installed and the version is correct"
       shell: powershell.exe
       command: |
-        sh gcloud version
+        sh gcloud versions
 
 jobs:
   install:

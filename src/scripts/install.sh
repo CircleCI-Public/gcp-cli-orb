@@ -26,7 +26,8 @@ install() {
   [ -z "$arg_version" ] && { printf '%s\n' "No version provided."; return 1; }
 
   local install_dir
-  install_dir="$(mktemp -d)"
+  #install_dir="$(mktemp -d)"
+  install_dir="/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
 
   # after version 370, gcloud is called "cli" rather than "sdk"
   major_version="$(echo "$1" | awk -F. '{print $1}')"
@@ -35,9 +36,9 @@ install() {
 
   download_with_retry "$install_dir/google-cloud-sdk.tar.gz" "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
   if [ "$platform" = "windows" ]; then
-    cp -R "$install_dir"/google-cloud-sdk/bin/* "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
-    cp -R "$install_dir"/google-cloud-sdk/lib "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
-    cp -R "$install_dir"/google-cloud-sdk/platform "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
+    #cp -R "$install_dir"/google-cloud-sdk/bin/* "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
+    #cp -R "$install_dir"/google-cloud-sdk/lib "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
+    #cp -R "$install_dir"/google-cloud-sdk/platform "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
   fi
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
