@@ -117,8 +117,8 @@ download_with_retry() {
 
 create_wrappers() {
   local download_directory="$1"
-  cat <<EOF > /c/Users/circleci/AppData/Local/Microsoft/WindowsApp/gcloud
-  bash -c "$download_directory/google-cloud-sdk/bin/gcloud"
+  cat <<EOF > /c/Users/circleci/AppData/Local/Microsoft/WindowsApps/gcloud
+  bash -c "$download_directory/google-cloud-sdk/bin/gcloud \$@"
 EOF
 }
 
