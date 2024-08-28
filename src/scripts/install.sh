@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# shellcheck disable=SC3043,SC3009 # while "local" isn't POSIX, it's supported in many shells. See: https://www.shellcheck.net/wiki/SC3043
+# shellcheck disable=SC3043 # while "local" isn't POSIX, it's supported in many shells. See: https://www.shellcheck.net/wiki/SC3043
 
 fetch_latest_version() {
   local release_notes
@@ -35,8 +35,8 @@ install() {
 
   download_with_retry "$install_dir/google-cloud-sdk.tar.gz" "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
   if [ "$platform" = "windows" ]; then
-    cp -R "$install_dir/google-cloud-sdk" "/c/Program Files/Google/"
-    create_wrappers "$install_dir"
+    cp -R "$install_dir"/google-cloud-sdk/bin/* "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
+    cp -R "$install_dir"/google-cloud-sdk/lib "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
   fi
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
@@ -114,15 +114,6 @@ download_with_retry() {
     printf "Failed to download and extract the tar file after %d attempts.\n" "$max_download_tries"
     return 1
   fi
-}
-
-create_wrappers() {
-  for COMMAND in {bootstrapping,docker-credential-gcloud,git-credential-gcloud.sh,bq,gcloud,gsutil}; do
-  cat <<EOF > /c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"$COMMAND"
-#!/usr/bin/bash
-  bash -c "/c/Program Files/Google/google-cloud-sdk/bin/$COMMAND \$@"
-EOF
-done
 }
 
 # Check if curl is installed
