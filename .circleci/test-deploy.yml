@@ -42,13 +42,13 @@ post-steps:
       name: "Check if the CLI was installed and the version is correct"
       shell: cmd.exe
       command: |
-        gcloud version || EXIT 1
+        sh gcloud version
 
   - run: &check-cli-version-powershell
       name: "Check if the CLI was installed and the version is correct"
       shell: powershell.exe
       command: |
-        gcloud version || exit 1
+        sh gcloud version
 
 jobs:
   install:

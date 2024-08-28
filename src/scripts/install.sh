@@ -37,6 +37,7 @@ install() {
   if [ "$platform" = "windows" ]; then
     cp -R "$install_dir"/google-cloud-sdk/bin/* "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
     cp -R "$install_dir"/google-cloud-sdk/lib "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
+    cp -R "$install_dir"/google-cloud-sdk/platform "/c/Users/circleci/AppData/Local/Microsoft/WindowsApps/"
   fi
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> "$BASH_ENV"
 
