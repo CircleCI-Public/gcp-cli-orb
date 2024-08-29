@@ -155,6 +155,8 @@ jobs:
     parameters:
       executor:
         type: executor
+      version:
+        type: string
     executor: <<parameters.executor>>
     steps:
       - checkout
@@ -221,6 +223,7 @@ workflows:
             alias: test-auth-oidc
             parameters:
               executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
+              version: [latest, 456.0.0, 460.0.0]
           context:
             - cpe-gcp
 
