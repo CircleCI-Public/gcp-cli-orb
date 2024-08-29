@@ -68,7 +68,6 @@ post-steps:
 
   - run: &push-and-pull-docker-image
       name: "Builds a Docker image and publishes it to gcr"
-      shell: bash.exe
       command: |
         cat \<<EOF > Dockerfile
         FROM alpine:edge
