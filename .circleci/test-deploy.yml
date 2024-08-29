@@ -149,12 +149,25 @@ jobs:
     steps:
       - checkout
       - gcp-cli/setup:
-          components: kubectl package-go-module # smallest not install gcloud components
+          components: kubectl package-go-module
           version: <<parameters.version>>
       - run: gcloud components list | grep package-go-module || exit 1
-      - run: *push-and-pull-docker-image
 
   auth-oidc:
+    parameters:
+      executor:
+        type: executor
+      version:
+        type: string
+    executor: <<parameters.executor>>
+    steps:
+      - checkout
+      - gcp-cli/setup:
+          use_oidc: true
+          version: <<parameters.version>>
+      - run: *check-cli-version
+
+  auth-oidc-docker:
     parameters:
       executor:
         type: executor
@@ -226,6 +239,15 @@ workflows:
           matrix:
             alias: test-auth-oidc
             parameters:
+              executor: [gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
+              version: [latest, 456.0.0, 460.0.0]
+          context:
+            - cpe-gcp
+
+      - auth-oidc-docker:
+          matrix:
+            alias: test-auth-oidc-docker
+            parameters:
               executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
               version: [latest, 456.0.0, 460.0.0]
           context:
@@ -254,6 +276,7 @@ workflows:
             - test-alpine-versions
             - test-install-components
             - test-auth-oidc
+            - test-auth-oidc-docker
             - orb-tools/pack
           context: orb-publisher
           filters:
