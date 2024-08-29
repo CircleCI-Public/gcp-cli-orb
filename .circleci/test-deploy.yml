@@ -142,11 +142,14 @@ jobs:
     parameters:
       executor:
         type: executor
+      version:
+        type: string
     executor: <<parameters.executor>>
     steps:
       - checkout
       - gcp-cli/setup:
           components: kubectl package-go-module # smallest not install gcloud components
+          version: <<parameters.version>>
       - run: gcloud components list | grep package-go-module || exit 1
       - run: *push-and-pull-docker-image
 
@@ -161,6 +164,7 @@ jobs:
       - checkout
       - gcp-cli/setup:
           use_oidc: true
+          version: <<parameters.version>>
       - run: *check-cli-version
       - run: *push-and-pull-docker-image
 
