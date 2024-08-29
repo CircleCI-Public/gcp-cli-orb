@@ -84,6 +84,17 @@ post-steps:
         docker image prune -af
         gcloud container images delete gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R" --quiet
 
+  - run: &push-and-pull-docker-image-win
+      name: "Builds a Docker image and publishes it to gcr"
+      command: |
+        R=$(printf "%s%s-win" $(date) $(seq 10 | shuf | tr -d '\n') | sha256sum | cut -f1 -d' ')
+        gcloud auth configure-docker --quiet
+        docker pull mcr.microsoft.com/azureiotedge/sqlite:1.0
+        docker tag mcr.microsoft.com/azureiotedge/sqlite:1.0 gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
+        docker push gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
+        docker image prune -af
+        gcloud container images delete gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R" --quiet
+
 jobs:
   install:
     parameters:
@@ -182,6 +193,21 @@ jobs:
       - run: *check-cli-version
       - run: *push-and-pull-docker-image
 
+  auth-oidc-docker-win:
+    parameters:
+      executor:
+        type: executor
+      version:
+        type: string
+    executor: <<parameters.executor>>
+    steps:
+      - checkout
+      - gcp-cli/setup:
+          use_oidc: true
+          version: <<parameters.version>>
+      - run: *check-cli-version
+      - run: *push-and-pull-docker-image-win
+
 executors:
   alpine:
     docker:
@@ -248,7 +274,16 @@ workflows:
           matrix:
             alias: test-auth-oidc-docker
             parameters:
-              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
+              executor: [gcp-cli/machine, ubuntu-2204-edge]
+              version: [latest, 456.0.0, 460.0.0]
+          context:
+            - cpe-gcp
+
+      - auth-oidc-docker-win:
+          matrix:
+            alias: test-auth-oidc-docker-win
+            parameters:
+              executor: [windows-2019, windows-2022]
               version: [latest, 456.0.0, 460.0.0]
           context:
             - cpe-gcp
@@ -277,6 +312,7 @@ workflows:
             - test-install-components
             - test-auth-oidc
             - test-auth-oidc-docker
+            - test-auth-oidc-docker-win
             - orb-tools/pack
           context: orb-publisher
           filters:
