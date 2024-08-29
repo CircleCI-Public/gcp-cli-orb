@@ -75,13 +75,14 @@ post-steps:
         RUN apk add curl
         CMD ["curl", "--version"]
         EOF
-        docker build . -t gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest
+        R=$(printf "%s%s" $(date) $(seq 10 | shuf | tr -d '\n') | sha256sum | cut -f1 -d' ')
+        docker build . -t gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
         gcloud auth configure-docker --quiet
-        docker push gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest
+        docker push gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
         docker image prune -af
-        docker pull gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest
+        docker pull gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
         docker image prune -af
-        gcloud container images delete gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:latest --quiet
+        gcloud container images delete gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R" --quiet
 
 jobs:
   install:
