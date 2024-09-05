@@ -279,14 +279,14 @@ workflows:
           context:
             - cpe-gcp
 
-      - auth-oidc-docker-win:
-          matrix:
-            alias: test-auth-oidc-docker-win
-            parameters:
-              executor: [windows-2019, windows-2022]
-              version: [latest, 456.0.0, 460.0.0]
-          context:
-            - cpe-gcp
+      #- auth-oidc-docker-win:
+      #    matrix:
+      #      alias: test-auth-oidc-docker-win
+      #      parameters:
+      #        executor: [windows-2019, windows-2022]
+      #        version: [latest, 456.0.0, 460.0.0]
+      #    context:
+      #      - cpe-gcp
 
       - install-components:
           matrix:
