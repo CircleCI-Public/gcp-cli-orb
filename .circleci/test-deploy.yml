@@ -312,7 +312,6 @@ workflows:
             - test-install-components
             - test-auth-oidc
             - test-auth-oidc-docker
-            - test-auth-oidc-docker-win
             - orb-tools/pack
           context: orb-publisher
           filters:
