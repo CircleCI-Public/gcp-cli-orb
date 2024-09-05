@@ -17,6 +17,7 @@ post-steps:
         else
           gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
         fi
+
   - run: &check-cli-version-alpine
       name: "Check if the CLI was installed and the version is correct"
       command: |
@@ -26,6 +27,73 @@ post-steps:
         else
           gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
         fi
+
+  - run: &check-cli-version-bash
+      name: "Check if the CLI was installed and the version is correct"
+      shell: bash.exe
+      command: |
+        if [ << parameters.version >> = "latest" ]; then
+          gcloud version || exit 1
+        else
+          gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+        fi
+
+  - run: &check-cli-version-cmd
+      name: "Check if the CLI was installed and the version is correct"
+      shell: cmd.exe
+      command: |
+        bash gcloud version
+
+  - run: &check-cli-version-powershell
+      name: "Check if the CLI was installed and the version is correct"
+      shell: powershell.exe
+      command: |
+        bash gcloud version
+
+  - run: &check-gcloud-auth-gcr-bash
+      name: "Check if the CLI can generate docker configuration json file to pull images from gcr"
+      shell: bash.exe
+      command: |
+        gcloud auth configure-docker --quiet
+        test -f /c/Users/circleci/.docker/config.json
+        rm /c/Users/circleci/.docker/config.json
+
+  - run: &check-gcloud-auth-gcr-powershell
+      name: "Check if the CLI can generate docker configuration json file to pull images from gcr"
+      shell: powershell.exe
+      command: |
+        bash gcloud auth configure-docker --quiet
+        Test-Path C:\Users\circleci\.docker\config.json
+        rm C:\Users\circleci\.docker\config.json
+
+  - run: &push-and-pull-docker-image
+      name: "Builds a Docker image and publishes it to gcr"
+      command: |
+        cat \<<EOF > Dockerfile
+        FROM alpine:edge
+        RUN apk update
+        RUN apk add curl
+        CMD ["curl", "--version"]
+        EOF
+        R=$(printf "%s%s" $(date) $(seq 10 | shuf | tr -d '\n') | sha256sum | cut -f1 -d' ')
+        docker build . -t gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
+        gcloud auth configure-docker --quiet
+        docker push gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
+        docker image prune -af
+        docker pull gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
+        docker image prune -af
+        gcloud container images delete gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R" --quiet
+
+  - run: &push-and-pull-docker-image-win
+      name: "Builds a Docker image and publishes it to gcr"
+      command: |
+        R=$(printf "%s%s-win" $(date) $(seq 10 | shuf | tr -d '\n') | sha256sum | cut -f1 -d' ')
+        gcloud auth configure-docker --quiet
+        docker pull mcr.microsoft.com/azureiotedge/sqlite:1.0
+        docker tag mcr.microsoft.com/azureiotedge/sqlite:1.0 gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
+        docker push gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
+        docker image prune -af
+        gcloud container images delete gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R" --quiet
 
 jobs:
   install:
@@ -39,6 +107,22 @@ jobs:
       - gcp-cli/install:
           version: <<parameters.version>>
       - run: *check-cli-version
+
+  install-win:
+    parameters:
+      executor:
+        type: executor
+      version:
+        type: string
+    executor: <<parameters.executor>>
+    steps:
+      - gcp-cli/install:
+          version: <<parameters.version>>
+      - run: *check-cli-version-bash
+      - run: *check-cli-version-cmd
+      - run: *check-cli-version-powershell
+      - run: *check-gcloud-auth-gcr-bash
+      - run: *check-gcloud-auth-gcr-powershell
 
   install-alpine:
     parameters:
@@ -67,21 +151,62 @@ jobs:
       - run: *check-cli-version
 
   install-components:
-    executor: gcp-cli/default
+    parameters:
+      executor:
+        type: executor
+      version:
+        type: string
+    executor: <<parameters.executor>>
     steps:
       - checkout
-      - run: python --version
       - gcp-cli/setup:
-          components: kubectl package-go-module # smallest not install gcloud components
+          components: kubectl package-go-module
+          version: <<parameters.version>>
       - run: gcloud components list | grep package-go-module || exit 1
 
   auth-oidc:
-    executor: gcp-cli/default
+    parameters:
+      executor:
+        type: executor
+      version:
+        type: string
+    executor: <<parameters.executor>>
     steps:
       - checkout
-      - run: python --version
       - gcp-cli/setup:
           use_oidc: true
+          version: <<parameters.version>>
+      - run: *check-cli-version
+
+  auth-oidc-docker:
+    parameters:
+      executor:
+        type: executor
+      version:
+        type: string
+    executor: <<parameters.executor>>
+    steps:
+      - checkout
+      - gcp-cli/setup:
+          use_oidc: true
+          version: <<parameters.version>>
+      - run: *check-cli-version
+      - run: *push-and-pull-docker-image
+
+  auth-oidc-docker-win:
+    parameters:
+      executor:
+        type: executor
+      version:
+        type: string
+    executor: <<parameters.executor>>
+    steps:
+      - checkout
+      - gcp-cli/setup:
+          use_oidc: true
+          version: <<parameters.version>>
+      - run: *check-cli-version
+      - run: *push-and-pull-docker-image-win
 
 executors:
   alpine:
@@ -106,7 +231,16 @@ workflows:
           matrix:
             alias: test-executor-versions
             parameters:
-              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
+              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge]
+              version: [latest, 456.0.0, 460.0.0]
+          context: orb-publisher
+          filters: *filters
+
+      - install-win:
+          matrix:
+            alias: test-win-executor-versions
+            parameters:
+              executor: [windows-2019, windows-2022]
               version: [latest, 456.0.0, 460.0.0]
           context: orb-publisher
           filters: *filters
@@ -128,10 +262,38 @@ workflows:
           filters: *filters
 
       - auth-oidc:
+          matrix:
+            alias: test-auth-oidc
+            parameters:
+              executor: [gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
+              version: [latest, 456.0.0, 460.0.0]
           context:
             - cpe-gcp
 
+      - auth-oidc-docker:
+          matrix:
+            alias: test-auth-oidc-docker
+            parameters:
+              executor: [gcp-cli/machine, ubuntu-2204-edge]
+              version: [latest, 456.0.0, 460.0.0]
+          context:
+            - cpe-gcp
+
+      #- auth-oidc-docker-win:
+      #    matrix:
+      #      alias: test-auth-oidc-docker-win
+      #      parameters:
+      #        executor: [windows-2019, windows-2022]
+      #        version: [latest, 456.0.0, 460.0.0]
+      #    context:
+      #      - cpe-gcp
+
       - install-components:
+          matrix:
+            alias: test-install-components
+            parameters:
+              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
+              version: [latest, 456.0.0, 460.0.0]
           context:
             - cpe-gcp
 
@@ -144,10 +306,12 @@ workflows:
           pub-type: production
           requires:
             - test-executor-versions
+            - test-win-executor-versions
             - test-google-versions
             - test-alpine-versions
-            - install-components
-            - auth-oidc
+            - test-install-components
+            - test-auth-oidc
+            - test-auth-oidc-docker
             - orb-tools/pack
           context: orb-publisher
           filters:
