@@ -33,6 +33,7 @@ parameters:
     description: |
       Name of environment variable storing the Google project ID to set as
       default for the gcloud CLI.
+      Setting this environment variable is optional.
 
   google_compute_zone:
     type: env_var_name

@@ -43,7 +43,9 @@ else
   gcloud auth activate-service-account --key-file="$HOME"/gcloud-service-key.json
 fi
 
-gcloud --quiet config set project "$project_id"
+if [[ -n "$project_id" ]]; then
+  gcloud --quiet config set project "$project_id"
+fi
 
 if [[ -n "$compute_zone" ]]; then
   gcloud --quiet config set compute/zone "$compute_zone"
