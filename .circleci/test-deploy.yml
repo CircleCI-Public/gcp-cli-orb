@@ -283,7 +283,7 @@ workflows:
           context: orb-publisher
           filters: *filters
 
-      - install-macos-gcp-cli-500:
+      - install-macos:
           matrix:
             alias: test-macos-versions
             parameters:
@@ -292,7 +292,7 @@ workflows:
           context: orb-publisher
           filters: *filters
 
-      - install-macos-gcp-cli-400:
+      - install-macos:
           matrix:
             alias: test-macos-versions
             parameters:
