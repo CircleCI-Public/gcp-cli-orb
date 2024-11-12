@@ -233,6 +233,24 @@ executors:
   ubuntu-2204-edge:
     machine:
       image: ubuntu-2204:edge
+  macos-xcode-16-2-0:
+    macos:
+      xcode: 16.2.0
+  macos-xcode-16-1-0:
+    macos:
+      xcode: 16.1.0
+  macos-xcode-16-0-0:
+    macos:
+      xcode: 16.0.0
+  macos-xcode-15-4-0:
+    macos:
+      xcode: 15.4.0
+  macos-xcode-15-3-0:
+    macos:
+      xcode: 15.3.0
+  macos-xcode-14-3-1:
+    macos:
+      xcode: 14.3.1
 
 workflows:
   test-deploy:
@@ -267,7 +285,7 @@ workflows:
           matrix:
             alias: test-macos-versions
             parameters:
-              executor: [macos-16-2-0, windows-2022]
+              executor: [macos-xcode-16-2-0]
               version: [latest, 460.0.0]
           context: orb-publisher
           filters: *filters
