@@ -141,7 +141,9 @@ jobs:
     parameters:
       version:
         type: string
-    executor: "gcp-cli/macos"
+      executor:
+        type: executor
+    executor: <<parameters.executor>>
     steps:
       - gcp-cli/install:
           version: <<parameters.version>>
