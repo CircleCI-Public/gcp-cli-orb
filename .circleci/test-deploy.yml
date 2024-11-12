@@ -232,7 +232,7 @@ workflows:
             alias: test-executor-versions
             parameters:
               executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge]
-              version: [latest, 456.0.0, 460.0.0]
+              version: [latest, 460.0.0]
           context: orb-publisher
           filters: *filters
 
@@ -241,7 +241,7 @@ workflows:
             alias: test-win-executor-versions
             parameters:
               executor: [windows-2019, windows-2022]
-              version: [latest, 456.0.0, 460.0.0]
+              version: [latest, 460.0.0]
           context: orb-publisher
           filters: *filters
 
@@ -249,7 +249,7 @@ workflows:
           matrix:
             alias: test-alpine-versions
             parameters:
-              version: [latest, 370.0.0, 410.0.0]
+              version: [latest, 460.0.0]
           context: orb-publisher
           filters: *filters
 
@@ -257,7 +257,7 @@ workflows:
           matrix:
             alias: test-google-versions
             parameters:
-              version: [latest, 456.0.0, 410.0.0]
+              version: [latest, 460.0.0]
           context: orb-publisher
           filters: *filters
 
@@ -266,7 +266,7 @@ workflows:
             alias: test-auth-oidc
             parameters:
               executor: [gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
-              version: [latest, 456.0.0, 460.0.0]
+              version: [latest, 460.0.0]
           context:
             - cpe-gcp
 
@@ -275,7 +275,7 @@ workflows:
             alias: test-auth-oidc-docker
             parameters:
               executor: [gcp-cli/machine, ubuntu-2204-edge]
-              version: [latest, 456.0.0, 460.0.0]
+              version: [latest, 460.0.0]
           context:
             - cpe-gcp
 
@@ -284,7 +284,7 @@ workflows:
       #      alias: test-auth-oidc-docker-win
       #      parameters:
       #        executor: [windows-2019, windows-2022]
-      #        version: [latest, 456.0.0, 460.0.0]
+      #        version: [latest, 460.0.0]
       #    context:
       #      - cpe-gcp
 
@@ -293,7 +293,7 @@ workflows:
             alias: test-install-components
             parameters:
               executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
-              version: [latest, 456.0.0, 460.0.0]
+              version: [latest, 460.0.0]
           context:
             - cpe-gcp
 

@@ -33,7 +33,7 @@ install() {
   if [ "$major_version" -gt 370 ]; then url_path_fixture="cli"
   else url_path_fixture="sdk"; fi
 
-  download_with_retry "$install_dir/google-cloud-sdk.tar.gz" "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
+  download_with_retry "$url_path_fixture" "$arg_version" "$install_dir" || exit 1
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.bash.inc" >> ~/.bashrc
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.fish.inc" >> ~/.fishrc
   printf '%s\n' ". $install_dir/google-cloud-sdk/path.zsh.inc" >> ~/.zshrc
@@ -81,27 +81,32 @@ uninstall() {
 }
 
 download_and_extract() {
-  local output_file="$1"
-  local url_path_fixture="$2"
-  local version="$3"
-  local install_directory="$4"
+  local url_path_fixture="$1"
+  local version="$2"
+  local install_directory="$3"
 
-  curl --location --silent --fail --retry 3 --output "$output_file" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$version-linux-x86_64.tar.gz"
-  tar -xzf "$output_file" -C "$install_directory"
+  if [ "${platform}" = "windows" ]; then
+    output_file="$install_directory/google-cloud-sdk.zip"
+    curl --location --silent --fail --retry 3 --output "$output_file" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$version-windows-x86_64.zip"
+    unzip "$output_file" -d "$install_directory"
+  else
+    output_file="$install_directory/google-cloud-sdk.tar.gz"
+    curl --location --silent --fail --retry 3 --output "$output_file" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$version-linux-x86_64.tar.gz"
+    tar -xzf "$output_file" -C "$install_directory"
+  fi
 
   return $?
 }
 
 download_with_retry() {
-  local output_file="$1"
-  local url_path_fixture="$2"
-  local version="$3"
-  local install_directory="$4"
+  local url_path_fixture="$1"
+  local version="$2"
+  local install_directory="$3"
   local download_tries=0
   local max_download_tries=3
 
   while [ $download_tries -lt $max_download_tries ]; do
-    if download_and_extract "$output_file" "$url_path_fixture" "$version" "$install_directory"; then
+    if download_and_extract "$url_path_fixture" "$version" "$install_directory"; then
       break
     else
       download_tries=$((download_tries + 1))
