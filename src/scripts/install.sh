@@ -91,7 +91,7 @@ download_and_extract() {
     unzip "$output_file" -d "$install_directory"
   else
     output_file="$install_directory/google-cloud-sdk.tar.gz"
-    curl --location --silent --fail --retry 3 --output "$output_file" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$version-linux-x86_64.tar.gz"
+    curl --location --silent --fail --retry 3 --output "$output_file" "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-$url_path_fixture-$version-$platform-x86_64.tar.gz"
     tar -xzf "$output_file" -C "$install_directory"
   fi
 
@@ -131,7 +131,7 @@ fi
 unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     platform=linux;;
-    Darwin*)    platform=mac;;
+    Darwin*)    platform=darwin;;
     CYGWIN*)    platform=windows;;
     MINGW*)     platform=windows;;
     MSYS_NT*)   platform=windows;;
