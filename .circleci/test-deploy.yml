@@ -283,12 +283,21 @@ workflows:
           context: orb-publisher
           filters: *filters
 
-      - install-macos:
+      - install-macos-gcp-cli-500:
           matrix:
             alias: test-macos-versions
             parameters:
-              executor: [macos-xcode-16-2-0]
-              version: [latest, 460.0.0]
+              executor: [macos-xcode-16-2-0, macos-xcode-16-1-0, macos-xcode-16-0-0]
+              version: [500.0.0]
+          context: orb-publisher
+          filters: *filters
+
+      - install-macos-gcp-cli-400:
+          matrix:
+            alias: test-macos-versions
+            parameters:
+              executor: [macos-xcode-15-4-0, macos-xcode-15-3-0, macos-xcode-14-3-1]
+              version: [460.0.0]
           context: orb-publisher
           filters: *filters
 
