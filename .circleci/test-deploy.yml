@@ -285,7 +285,7 @@ workflows:
 
       - install-macos:
           matrix:
-            alias: test-macos-versions
+            alias: test-macos-versions-500
             parameters:
               executor: [macos-xcode-16-2-0, macos-xcode-16-1-0, macos-xcode-16-0-0]
               version: [500.0.0]
@@ -294,7 +294,7 @@ workflows:
 
       - install-macos:
           matrix:
-            alias: test-macos-versions
+            alias: test-macos-versions-400
             parameters:
               executor: [macos-xcode-15-4-0, macos-xcode-15-3-0, macos-xcode-14-3-1]
               version: [460.0.0]
@@ -357,7 +357,8 @@ workflows:
             - test-win-executor-versions
             - test-google-versions
             - test-alpine-versions
-            - test-macos-versions
+            - test-macos-versions-400
+            - test-macos-versions-500
             - test-install-components
             - test-auth-oidc
             - test-auth-oidc-docker
