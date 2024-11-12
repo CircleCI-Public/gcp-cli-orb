@@ -16,4 +16,4 @@ parameters:
 
 macos:
   xcode: <<parameters.xcode_version>>
-resource_class: << parameters.resource-class >>
+  resource_class: << parameters.resource_class >>
