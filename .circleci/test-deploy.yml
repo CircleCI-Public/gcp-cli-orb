@@ -137,6 +137,16 @@ jobs:
           version: << parameters.version >>
       - run: *check-cli-version-alpine
 
+  install-macos:
+    parameters:
+      version:
+        type: string
+    executor: "gcp-cli/macos"
+    steps:
+      - gcp-cli/install:
+          version: <<parameters.version>>
+      - run: *check-cli-version
+
   install-google:
     parameters:
       version:
@@ -253,6 +263,15 @@ workflows:
           context: orb-publisher
           filters: *filters
 
+      - install-macos:
+          matrix:
+            alias: test-macos-versions
+            parameters:
+              executor: [macos-16-2-0, windows-2022]
+              version: [latest, 460.0.0]
+          context: orb-publisher
+          filters: *filters
+
       - install-google:
           matrix:
             alias: test-google-versions
@@ -309,6 +328,7 @@ workflows:
             - test-win-executor-versions
             - test-google-versions
             - test-alpine-versions
+            - test-macos-versions
             - test-install-components
             - test-auth-oidc
             - test-auth-oidc-docker
