@@ -74,12 +74,14 @@ post-steps:
       command: |
         cat \<<EOF > Dockerfile
         FROM alpine:edge
+        ARG JOB_NUMBER
+        RUn echo $JOB_NUMBER > job_number
         RUN apk update
         RUN apk add curl
         CMD ["curl", "--version"]
         EOF
         R=$(printf "%s%s" $(date) $(seq 10 | shuf | tr -d '\n') | sha256sum | cut -f1 -d' ')
-        docker build . -t gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
+        docker build . --build-arg JOB_NUMBER=$CIRCLE_BUILD_NUM -t gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
         gcloud auth configure-docker --quiet
         docker push gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
         docker image prune -af
