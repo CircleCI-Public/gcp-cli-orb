@@ -15,6 +15,7 @@ post-steps:
         if [ << parameters.version >> = "latest" ]; then
           gcloud version || exit 1
         else
+          gcloud --version
           gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
         fi
 
@@ -25,6 +26,7 @@ post-steps:
         if [ << parameters.version >> = "latest" ]; then
           gcloud version || exit 1
         else
+          gcloud --version
           gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
         fi
 
@@ -35,6 +37,7 @@ post-steps:
         if [ << parameters.version >> = "latest" ]; then
           gcloud version || exit 1
         else
+          gcloud --version
           gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
         fi
 
@@ -71,12 +74,14 @@ post-steps:
       command: |
         cat \<<EOF > Dockerfile
         FROM alpine:edge
+        ARG JOB_NUMBER
+        RUn echo $JOB_NUMBER > job_number
         RUN apk update
         RUN apk add curl
         CMD ["curl", "--version"]
         EOF
         R=$(printf "%s%s" $(date) $(seq 10 | shuf | tr -d '\n') | sha256sum | cut -f1 -d' ')
-        docker build . -t gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
+        docker build . --build-arg JOB_NUMBER=$CIRCLE_BUILD_NUM -t gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
         gcloud auth configure-docker --quiet
         docker push gcr.io/cpe-gcp-orb-testing/gcp-cli-orb-test-image:"$R"
         docker image prune -af
@@ -136,6 +141,18 @@ jobs:
       - gcp-cli/install:
           version: << parameters.version >>
       - run: *check-cli-version-alpine
+
+  install-macos:
+    parameters:
+      version:
+        type: string
+      executor:
+        type: executor
+    executor: <<parameters.executor>>
+    steps:
+      - gcp-cli/install:
+          version: <<parameters.version>>
+      - run: *check-cli-version
 
   install-google:
     parameters:
@@ -223,6 +240,24 @@ executors:
   ubuntu-2204-edge:
     machine:
       image: ubuntu-2204:edge
+  macos-xcode-16-2-0:
+    macos:
+      xcode: 16.2.0
+  macos-xcode-16-1-0:
+    macos:
+      xcode: 16.1.0
+  macos-xcode-16-0-0:
+    macos:
+      xcode: 16.0.0
+  macos-xcode-15-4-0:
+    macos:
+      xcode: 15.4.0
+  macos-xcode-15-3-0:
+    macos:
+      xcode: 15.3.0
+  macos-xcode-14-3-1:
+    macos:
+      xcode: 14.3.1
 
 workflows:
   test-deploy:
@@ -250,6 +285,24 @@ workflows:
             alias: test-alpine-versions
             parameters:
               version: [latest, 460.0.0]
+          context: orb-publisher
+          filters: *filters
+
+      - install-macos:
+          matrix:
+            alias: test-macos-versions-500
+            parameters:
+              executor: [macos-xcode-16-2-0, macos-xcode-16-1-0, macos-xcode-16-0-0]
+              version: [500.0.0]
+          context: orb-publisher
+          filters: *filters
+
+      - install-macos:
+          matrix:
+            alias: test-macos-versions-400
+            parameters:
+              executor: [macos-xcode-15-4-0, macos-xcode-15-3-0, macos-xcode-14-3-1]
+              version: [460.0.0]
           context: orb-publisher
           filters: *filters
 
@@ -309,6 +362,8 @@ workflows:
             - test-win-executor-versions
             - test-google-versions
             - test-alpine-versions
+            - test-macos-versions-400
+            - test-macos-versions-500
             - test-install-components
             - test-auth-oidc
             - test-auth-oidc-docker
