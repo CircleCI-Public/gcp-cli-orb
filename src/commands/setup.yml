@@ -13,6 +13,11 @@ parameters:
       If left to "latest", the latest version will be installed.
       Otherwise, provide the full version number as it appears in the URL on this page: https://cloud.google.com/sdk/docs/downloads-versioned-archives
 
+  skip_install:
+    type: boolean
+    default: false
+    description: Set to true, if want to install step
+
   components:
       type: string
       default: ""
@@ -85,9 +90,13 @@ parameters:
     description: Output location of OIDC credentials.
 
 steps:
-  - install:
-      version: << parameters.version >>
-      components: << parameters.components >>
+  - when:
+      condition:
+        not: << parameters.skip_install >>
+      steps:
+        - install:
+            version: << parameters.version >>
+            components: << parameters.components >>
   - run:
       name: Initialize gcloud CLI to connect to Google Cloud
       environment:
