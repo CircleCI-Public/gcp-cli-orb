@@ -182,7 +182,7 @@ if command -v gcloud > /dev/null 2>&1; then
       printf '%s\n' "Skipping installation."
     fi
   else
-      printf '%s\n' "Found `gcloud` installed: ($installed_version)."
+      printf '%s\n' "Found gcloud installed: ($installed_version)."
       printf '%s\n' "Skipping installation."
   fi
 
