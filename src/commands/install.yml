@@ -18,6 +18,11 @@ parameters:
     description: >
       The list of gcloud components to install. Space separated.
       See https://cloud.google.com/sdk/docs/components for additional info.
+  skip_installation:
+    type: boolean
+    default: false
+    description: >
+      Useful flag to use when the executor already contains a valid gcloud installation.
 
 steps:
   - run:
@@ -25,4 +30,5 @@ steps:
       environment:
         ORB_VAL_VERSION: <<parameters.version>>
         ORB_VAL_COMPONENTS: <<parameters.components>>
+        ORB_VAL_SKIP_INSTALLATION: <<parameters.skip_installation>>
       command: << include(scripts/install.sh) >>
