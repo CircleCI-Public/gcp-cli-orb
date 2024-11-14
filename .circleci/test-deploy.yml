@@ -185,6 +185,9 @@ jobs:
         type: string
       executor:
         type: executor
+      skip_installation:
+        type: boolean
+        default: true
     executor: << parameters.executor >>
     steps:
       - run:
@@ -192,7 +195,7 @@ jobs:
           command: apt-get install sudo -y
       - gcp-cli/install:
           version: << parameters.version >>
-          skip_installation: true
+          skip_installation: << parameters.skip_installation >>
       - run: *check-cli-version-skip-install
 
   install-components:
