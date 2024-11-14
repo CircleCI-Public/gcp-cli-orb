@@ -158,6 +158,8 @@ jobs:
     parameters:
       version:
         type: string
+      executor:
+        type: executor
     executor: << parameters.executor >>
     steps:
       - run:
