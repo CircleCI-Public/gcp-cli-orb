@@ -158,7 +158,7 @@ jobs:
     parameters:
       version:
         type: string
-    executor: "gcp-cli/google"
+    executor: << parameters.executor >>
     steps:
       - run:
           name: Install sudo
@@ -258,6 +258,9 @@ executors:
   macos-xcode-14-3-1:
     macos:
       xcode: 14.3.1
+  google-gcp-cli-451-0-0:
+    docker:
+      - image: google/cloud-sdk:451.0.0
 
 workflows:
   test-deploy:
@@ -310,7 +313,8 @@ workflows:
           matrix:
             alias: test-google-versions
             parameters:
-              version: [latest, 460.0.0]
+              version: [latest, 460.0.0, 451.0.1]
+              executor: [gcp-cli/google, google-gcp-cli-451-0-0]
           context: orb-publisher
           filters: *filters
 
