@@ -336,7 +336,7 @@ workflows:
           context: orb-publisher
           filters: *filters
 
-      - install-google-skip-install
+      - install-google-skip-install:
           matrix:
             alias: test-google-versions-skip-install
             parameters:
