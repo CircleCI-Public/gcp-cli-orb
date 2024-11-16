@@ -159,26 +159,33 @@ version="$ORB_VAL_VERSION"
 if command -v gcloud > /dev/null 2>&1; then
   installed_version="$(gcloud version | head -n 1 | sed 's/Google Cloud SDK \([0-9]*.[0-9]*.[0-9]*\)/\1/')"
 
-  if [ "$installed_version" != "$version" ]; then
-    # Figure out which version is older between the installed version and the requested version.
-    older_version="$(sort_versions "$installed_version" "$version")"
+  if [ "$ORB_VAL_SKIP_INSTALLATION" != 1 ]; then
 
-    # If the version requested is "latest" and the installed version is newer than the latest version available, skip installation.
-    if [ "$ORB_VAL_VERSION" = "latest" ] && [ "$older_version" = "$version" ]; then
-      printf '%s\n' "The version installed ($installed_version) is newer than the latest version listed in the release notes ($version)."
-      printf '%s\n' "Skipping installation."
+    if [ "$installed_version" != "$version" ]; then
+      # Figure out which version is older between the installed version and the requested version.
+      older_version="$(sort_versions "$installed_version" "$version")"
+
+      # If the version requested is "latest" and the installed version is newer than the latest version available, skip installation.
+      if [ "$ORB_VAL_VERSION" = "latest" ] && [ "$older_version" = "$version" ]; then
+        printf '%s\n' "The version installed ($installed_version) is newer than the latest version listed in the release notes ($version)."
+        printf '%s\n' "Skipping installation."
+      else
+        printf '%s\n' "The version installed ($installed_version) differs from the version requested ($version)."
+        printf '%s\n' "Uninstalling v${installed_version}..."
+        if ! uninstall; then printf '%s\n' "Failed to uninstall the current version."; exit 1; fi
+
+        printf '%s\n' "Installing v${version}..."
+        if ! install "$version"; then printf '%s\n' "Failed to install the requested version."; exit 1; fi
+      fi
     else
-      printf '%s\n' "The version installed ($installed_version) differs from the version requested ($version)."
-      printf '%s\n' "Uninstalling v${installed_version}..."
-      if ! uninstall; then printf '%s\n' "Failed to uninstall the current version."; exit 1; fi
-
-      printf '%s\n' "Installing v${version}..."
-      if ! install "$version"; then printf '%s\n' "Failed to install the requested version."; exit 1; fi
+      printf '%s\n' "The version installed ($installed_version) matches the version requested ($version)."
+      printf '%s\n' "Skipping installation."
     fi
   else
-    printf '%s\n' "The version installed ($installed_version) matches the version requested ($version)."
-    printf '%s\n' "Skipping installation."
+      printf '%s\n' "Found gcloud installed: ($installed_version)."
+      printf '%s\n' "Skipping installation."
   fi
+
 else
   printf '%s\n' "Google Cloud SDK is not installed. Installing it."
   if ! install "$version"; then printf '%s\n' "Failed to install the requested version."; exit 1; fi

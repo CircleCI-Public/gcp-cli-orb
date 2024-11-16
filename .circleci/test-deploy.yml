@@ -9,6 +9,16 @@ filters: &filters
     only: /.*/
 
 post-steps:
+  - run: &check-cli-version-skip-install
+      name: "Check if the CLI was installed and the version is correct"
+      command: |
+        if [ << parameters.version >> = "latest" ] || [ << parameters.skip_installation >> != 1 ]; then
+          gcloud version || exit 1
+        else
+          gcloud --version
+          gcloud --version | grep -q "Google Cloud SDK << parameters.version >>" || exit 1
+        fi
+
   - run: &check-cli-version
       name: "Check if the CLI was installed and the version is correct"
       command: |
@@ -158,7 +168,9 @@ jobs:
     parameters:
       version:
         type: string
-    executor: "gcp-cli/google"
+      executor:
+        type: executor
+    executor: << parameters.executor >>
     steps:
       - run:
           name: Install sudo
@@ -166,6 +178,25 @@ jobs:
       - gcp-cli/install:
           version: << parameters.version >>
       - run: *check-cli-version
+
+  install-google-skip-install:
+    parameters:
+      version:
+        type: string
+      executor:
+        type: executor
+      skip_installation:
+        type: boolean
+        default: true
+    executor: << parameters.executor >>
+    steps:
+      - run:
+          name: Install sudo
+          command: apt-get install sudo -y
+      - gcp-cli/install:
+          version: << parameters.version >>
+          skip_installation: << parameters.skip_installation >>
+      - run: *check-cli-version-skip-install
 
   install-components:
     parameters:
@@ -258,6 +289,9 @@ executors:
   macos-xcode-14-3-1:
     macos:
       xcode: 14.3.1
+  google-gcp-cli-451-0-0:
+    docker:
+      - image: google/cloud-sdk:451.0.0
 
 workflows:
   test-deploy:
@@ -310,7 +344,17 @@ workflows:
           matrix:
             alias: test-google-versions
             parameters:
-              version: [latest, 460.0.0]
+              version: [latest, 460.0.0, 451.0.1]
+              executor: [gcp-cli/google, google-gcp-cli-451-0-0]
+          context: orb-publisher
+          filters: *filters
+
+      - install-google-skip-install:
+          matrix:
+            alias: test-google-versions-skip-install
+            parameters:
+              version: [latest, 460.0.0, 451.0.1]
+              executor: [gcp-cli/google, google-gcp-cli-451-0-0]
           context: orb-publisher
           filters: *filters
 
@@ -361,6 +405,7 @@ workflows:
             - test-executor-versions
             - test-win-executor-versions
             - test-google-versions
+            - test-google-versions-skip-install
             - test-alpine-versions
             - test-macos-versions-400
             - test-macos-versions-500
