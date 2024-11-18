@@ -300,7 +300,7 @@ workflows:
           matrix:
             alias: test-executor-versions
             parameters:
-              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge]
+              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, ubuntu-2204:2024.03.1, ubuntu-2004:2024.03.1]
               version: [latest, 460.0.0]
           context: orb-publisher
           filters: *filters
@@ -362,7 +362,7 @@ workflows:
           matrix:
             alias: test-auth-oidc
             parameters:
-              executor: [gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
+              executor: [gcp-cli/machine, ubuntu-2204-edge, ubuntu-2204:2024.03.1, ubuntu-2004:2024.03.1, windows-2019, windows-2022]
               version: [latest, 460.0.0]
           context:
             - cpe-gcp
@@ -371,7 +371,7 @@ workflows:
           matrix:
             alias: test-auth-oidc-docker
             parameters:
-              executor: [gcp-cli/machine, ubuntu-2204-edge]
+              executor: [gcp-cli/machine, ubuntu-2204-edge, ubuntu-2204:2024.03.1, ubuntu-2004:2024.03.1]
               version: [latest, 460.0.0]
           context:
             - cpe-gcp
@@ -389,7 +389,7 @@ workflows:
           matrix:
             alias: test-install-components
             parameters:
-              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
+              executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, ubuntu-2204:2024.03.1, ubuntu-2004:2024.03.1, windows-2019, windows-2022]
               version: [latest, 460.0.0]
           context:
             - cpe-gcp
