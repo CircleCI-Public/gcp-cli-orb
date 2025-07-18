@@ -85,7 +85,7 @@ post-steps:
         cat \<<EOF > Dockerfile
         FROM alpine:edge
         ARG JOB_NUMBER
-        RUn echo $JOB_NUMBER > job_number
+        RUN echo $JOB_NUMBER > job_number
         RUN apk update
         RUN apk add curl
         CMD ["curl", "--version"]
