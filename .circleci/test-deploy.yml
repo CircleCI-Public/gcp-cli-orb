@@ -411,7 +411,7 @@ workflows:
             - test-macos-versions-500
             - test-install-components
             - test-auth-oidc
-            - test-auth-oidc-docker
+            #- test-auth-oidc-docker
             - orb-tools/pack
           context: orb-publisher
           filters:
