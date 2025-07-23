@@ -26,7 +26,12 @@ install() {
   [ -z "$arg_version" ] && { printf '%s\n' "No version provided."; return 1; }
 
   local install_dir
-  install_dir="$(mktemp -d)"
+  if [ "${platform}" = "windows" ]; then
+    mkdir -p /opt
+    install_dir="$(mktemp -d -p /opt -t gcloud-cli.XXXXXXXXXX)"
+  else
+    install_dir="$(mktemp -d)"
+  fi
 
   # after version 370, gcloud is called "cli" rather than "sdk"
   major_version="$(echo "$1" | awk -F. '{print $1}')"
