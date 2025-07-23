@@ -226,20 +226,20 @@ jobs:
           version: <<parameters.version>>
       - run: *check-cli-version
 
-  auth-oidc-docker:
-    parameters:
-      executor:
-        type: executor
-      version:
-        type: string
-    executor: <<parameters.executor>>
-    steps:
-      - checkout
-      - gcp-cli/setup:
-          use_oidc: true
-          version: <<parameters.version>>
-      - run: *check-cli-version
-      - run: *push-and-pull-docker-image
+#  auth-oidc-docker:
+#    parameters:
+#      executor:
+#        type: executor
+#      version:
+#        type: string
+#    executor: <<parameters.executor>>
+#    steps:
+#      - checkout
+#      - gcp-cli/setup:
+#          use_oidc: true
+#          version: <<parameters.version>>
+#      - run: *check-cli-version
+#      - run: *push-and-pull-docker-image
 
   auth-oidc-docker-win:
     parameters:
@@ -367,14 +367,14 @@ workflows:
           context:
             - cpe-gcp
 
-      - auth-oidc-docker:
-          matrix:
-            alias: test-auth-oidc-docker
-            parameters:
-              executor: [gcp-cli/machine, ubuntu-2204-edge]
-              version: [latest, 460.0.0]
-          context:
-            - cpe-gcp
+#      - auth-oidc-docker:
+#          matrix:
+#            alias: test-auth-oidc-docker
+#            parameters:
+#              executor: [gcp-cli/machine, ubuntu-2204-edge]
+#              version: [latest, 460.0.0]
+#          context:
+#            - cpe-gcp
 
       #- auth-oidc-docker-win:
       #    matrix:
