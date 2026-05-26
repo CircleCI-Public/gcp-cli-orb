@@ -400,6 +400,7 @@ workflows:
       - orb-tools/publish:
           orb-name: circleci/gcp-cli
           vcs-type: << pipeline.project.type >>
+          enable-pr-comment: false
           pub-type: production
           requires:
             - test-executor-versions

@@ -23,6 +23,7 @@ workflows:
       - orb-tools/publish:
           orb-name: circleci/gcp-cli
           vcs-type: << pipeline.project.type >>
+          enable-pr-comment: false
           requires:
             [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
           context: orb-publisher
