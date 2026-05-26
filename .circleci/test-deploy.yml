@@ -259,7 +259,7 @@ jobs:
 executors:
   alpine:
     docker:
-      - image: python:3.8-alpine
+      - image: python:3.13-alpine
   windows-2019:
     machine:
       resource_class: windows.medium
