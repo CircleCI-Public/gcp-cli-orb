@@ -326,7 +326,7 @@ workflows:
           matrix:
             alias: test-macos-versions-500
             parameters:
-              executor: [macos-xcode-16-2-0, macos-xcode-16-1-0, macos-xcode-16-0-0]
+              executor: [macos-xcode-16-2-0, macos-xcode-16-0-0]
               version: [500.0.0]
           context: orb-publisher
           filters: *filters
