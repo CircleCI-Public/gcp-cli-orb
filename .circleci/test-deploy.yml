@@ -259,7 +259,7 @@ jobs:
 executors:
   alpine:
     docker:
-      - image: python:3.8-alpine
+      - image: python:3.13-alpine
   windows-2019:
     machine:
       resource_class: windows.medium
@@ -301,7 +301,7 @@ workflows:
             alias: test-executor-versions
             parameters:
               executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge]
-              version: [latest, 460.0.0]
+              version: [latest, 500.0.0]
           context: orb-publisher
           filters: *filters
 
@@ -310,7 +310,7 @@ workflows:
             alias: test-win-executor-versions
             parameters:
               executor: [windows-2019, windows-2022]
-              version: [latest, 460.0.0]
+              version: [latest, 500.0.0]
           context: orb-publisher
           filters: *filters
 
@@ -318,7 +318,7 @@ workflows:
           matrix:
             alias: test-alpine-versions
             parameters:
-              version: [latest, 460.0.0]
+              version: [latest, 500.0.0]
           context: orb-publisher
           filters: *filters
 
@@ -326,7 +326,7 @@ workflows:
           matrix:
             alias: test-macos-versions-500
             parameters:
-              executor: [macos-xcode-16-2-0, macos-xcode-16-1-0, macos-xcode-16-0-0]
+              executor: [macos-xcode-16-2-0, macos-xcode-16-0-0]
               version: [500.0.0]
           context: orb-publisher
           filters: *filters
@@ -336,7 +336,7 @@ workflows:
             alias: test-macos-versions-400
             parameters:
               executor: [macos-xcode-15-4-0, macos-xcode-15-3-0, macos-xcode-14-3-1]
-              version: [460.0.0]
+              version: [500.0.0]
           context: orb-publisher
           filters: *filters
 
@@ -344,7 +344,7 @@ workflows:
           matrix:
             alias: test-google-versions
             parameters:
-              version: [latest, 460.0.0, 451.0.1]
+              version: [latest, 500.0.0, 451.0.1]
               executor: [gcp-cli/google, google-gcp-cli-451-0-0]
           context: orb-publisher
           filters: *filters
@@ -353,7 +353,7 @@ workflows:
           matrix:
             alias: test-google-versions-skip-install
             parameters:
-              version: [latest, 460.0.0, 451.0.1]
+              version: [latest, 500.0.0, 451.0.1]
               executor: [gcp-cli/google, google-gcp-cli-451-0-0]
           context: orb-publisher
           filters: *filters
@@ -363,7 +363,7 @@ workflows:
             alias: test-auth-oidc
             parameters:
               executor: [gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
-              version: [latest, 460.0.0]
+              version: [latest, 500.0.0]
           context:
             - cpe-gcp
 
@@ -390,7 +390,7 @@ workflows:
             alias: test-install-components
             parameters:
               executor: [gcp-cli/default, gcp-cli/machine, ubuntu-2204-edge, windows-2019, windows-2022]
-              version: [latest, 460.0.0]
+              version: [latest, 500.0.0]
           context:
             - cpe-gcp
 
@@ -400,6 +400,7 @@ workflows:
       - orb-tools/publish:
           orb-name: circleci/gcp-cli
           vcs-type: << pipeline.project.type >>
+          enable-pr-comment: false
           pub-type: production
           requires:
             - test-executor-versions
