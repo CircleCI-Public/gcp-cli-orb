@@ -2,19 +2,15 @@
 # shellcheck disable=SC3043 # while "local" isn't POSIX, it's supported in many shells. See: https://www.shellcheck.net/wiki/SC3043
 
 fetch_latest_version() {
-  local release_notes
-  local release_notes_exit_code
+  local components_json
 
-  release_notes="$(curl --location --silent --fail --retry 3 https://cloud.google.com/sdk/docs/release-notes)"
-  release_notes_exit_code="$?"
-
-  [ "$release_notes_exit_code" -gt 0 ] && { printf '%s\n' "Failed to get release notes"; return "$release_notes_exit_code"; }
-
-  local releases
-  releases="$(printf '%s\n' "$release_notes" | grep -E '<h2 id=".*" data-text=".*">[0-9]+.[0-9]+.[0-9]+.*</h2>' | sed 's/<h2.*>\([0-9]*.[0-9]*.[0-9]*\).*<\/h2>/\1/')"
+  if ! components_json="$(curl --location --silent --fail --retry 3 https://dl.google.com/dl/cloudsdk/channels/rapid/components-2.json)"; then
+    printf '%s\n' "Failed to get latest version information"
+    return 1
+  fi
 
   local latest_version
-  latest_version="$(printf '%s\n' "$releases" | head -n 1)"
+  latest_version="$(printf '%s\n' "$components_json" | grep -oE '"version"[[:space:]]*:[[:space:]]*"[0-9]+\.[0-9]+\.[0-9]+"' | tail -n 1 | sed 's/.*"\([0-9]*\.[0-9]*\.[0-9]*\)"/\1/')" || true
 
   [ -z "$latest_version" ] && { printf '%s\n' "Couldn't find out what is the latest version available."; return 1; }
   version="$latest_version"
@@ -172,7 +168,7 @@ if command -v gcloud > /dev/null 2>&1; then
 
       # If the version requested is "latest" and the installed version is newer than the latest version available, skip installation.
       if [ "$ORB_VAL_VERSION" = "latest" ] && [ "$older_version" = "$version" ]; then
-        printf '%s\n' "The version installed ($installed_version) is newer than the latest version listed in the release notes ($version)."
+        printf '%s\n' "The version installed ($installed_version) is newer than the latest version available ($version)."
         printf '%s\n' "Skipping installation."
       else
         printf '%s\n' "The version installed ($installed_version) differs from the version requested ($version)."
