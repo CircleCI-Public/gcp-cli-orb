@@ -4,7 +4,7 @@ usage:
   version: 2.1
 
   orbs:
-    gcp-cli: circleci/gcp-cli@3.2.2
+    gcp-cli: circleci/gcp-cli@4.1
 
   jobs:
     use-gcp:

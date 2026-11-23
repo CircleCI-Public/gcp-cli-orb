@@ -1,0 +1,23 @@
+description: >
+  Install the gcloud CLI and authenticate with OIDC using a V3 token. The workload identity provider
+  must be configured for V3 tokens, see https://circleci.com/docs/guides/permissions-authentication/openid-connect-tokens/
+usage:
+  version: 2.1
+
+  orbs:
+    gcp-cli: circleci/gcp-cli@4.1
+
+  jobs:
+    use-gcp:
+      executor: gcp-cli/default
+      steps:
+        - gcp-cli/setup:
+            use_oidc: true
+            oidc_token_version: v3
+        - run: gcloud storage ls
+
+  workflows:
+    install_and_configure_cli:
+      jobs:
+        - use-gcp:
+            context: gcp-oidc
