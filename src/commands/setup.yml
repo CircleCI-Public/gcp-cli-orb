@@ -60,6 +60,18 @@ parameters:
     default: false
     description: Set to true to enable OIDC
 
+  oidc_token_version:
+    type: enum
+    enum: ["v1", "v3"]
+    default: "v1"
+    description: |
+      OIDC token version used to authenticate when use_oidc is true. V3 tokens
+      add the checkout source and ref and the config source and ref as claims,
+      so the workload identity provider's attribute condition can require that
+      both the checked-out code and the pipeline config come from a protected
+      branch. The provider's attribute mapping and condition must match the V3
+      token, see https://circleci.com/docs/guides/permissions-authentication/openid-connect-tokens/
+
   google_project_number:
     type: env_var_name
     default: GOOGLE_PROJECT_NUMBER
@@ -106,6 +118,7 @@ steps:
         ORB_ENV_COMPUTE_REGION: <<parameters.google_compute_region>>
         # OIDC
         ORB_VAL_USE_OIDC: <<parameters.use_oidc>>
+        ORB_VAL_OIDC_TOKEN_VERSION: <<parameters.oidc_token_version>>
         ORB_ENV_PROJECT_NUMBER: <<parameters.google_project_number>>
         ORB_EVAL_CRED_FILE: <<parameters.gcp_cred_config_file_path>>
         ORB_ENV_POOL_ID: <<parameters.workload_identity_pool_id>>

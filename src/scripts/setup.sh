@@ -21,13 +21,26 @@ if [ -z "$CLOUDSDK_AUTH_ACCESS_TOKEN" ]; then # check issue/93
   if [ "$ORB_VAL_USE_OIDC" = 1 ]; then
     echo "Authorizing using OIDC token"
 
-    if [ -z "$CIRCLE_OIDC_TOKEN" ]; then
-      echo "Ensure this job has a context to populate OIDC token"
+    case "$ORB_VAL_OIDC_TOKEN_VERSION" in
+      v1) token_var=CIRCLE_OIDC_TOKEN ;;
+      v3) token_var=CIRCLE_OIDC_TOKEN_V3 ;;
+      *)
+        echo "Unsupported oidc_token_version: $ORB_VAL_OIDC_TOKEN_VERSION"
+        exit 1
+        ;;
+    esac
+
+    if [ -z "${!token_var}" ]; then
+      echo "\$$token_var is empty. Ensure this job has a context to populate OIDC token"
       echo "See more: https://circleci.com/docs/openid-connect-tokens/#openid-connect-id-token-availability"
       exit 1
     fi
 
-    echo "$CIRCLE_OIDC_TOKEN" > "$HOME/oidc_token"
+    if [ "$ORB_VAL_OIDC_TOKEN_VERSION" = v1 ]; then
+      echo "WARNING: Authenticating with a V1 OIDC token. Consider setting oidc_token_version to v3 and updating the workload identity provider's attribute mapping and condition to match. See https://circleci.com/docs/guides/permissions-authentication/openid-connect-tokens/"
+    fi
+
+    echo "${!token_var}" > "$HOME/oidc_token"
     # Store OIDC token in temp file
     gcloud iam workload-identity-pools create-cred-config \
         "projects/${!ORB_ENV_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${!ORB_ENV_POOL_ID}/providers/${!ORB_ENV_POOL_PROVIDER_ID}" \
